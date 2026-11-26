@@ -1,0 +1,3140 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>면학마루 — 기숙사 면학실 통합 관리 및 환경 연구 시스템</title>
+  <meta name="description" content="기숙사 면학시간 졸음·상벌점 관리, 추가 면학 신청, 방장 공지 게시판, 공휴일 출석 위치·시각 인증, 1:1 귓속말 및 이산화탄소 상관관계 연구 플랫폼" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet" />
+  <style id="app-styles">
+    :root {
+      --bg-canvas: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f1f5f9;
+      --border-hairline: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --accent-primary: #1d4ed8;
+      --accent-primary-hover: #1e40af;
+      --accent-dark: #0f172a;
+      --status-green: #15803d;
+      --status-green-bg: #f0fdf4;
+      --status-green-border: #bbf7d0;
+      --status-amber: #b45309;
+      --status-amber-bg: #fffbeb;
+      --status-amber-border: #fde68a;
+      --status-red: #b91c1c;
+      --status-red-bg: #fef2f2;
+      --status-red-border: #fecaca;
+      --font-display: "Plus Jakarta Sans", "Noto Sans KR", -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-sans: "DM Sans", "Noto Sans KR", -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: var(--font-display);
+      margin: 0;
+      text-wrap: balance;
+    }
+
+    p { margin: 0; }
+
+    button, input, select, textarea {
+      font-family: inherit;
+    }
+
+    .mono-num {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tabular {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Layout */
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-hairline);
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+
+    .brand-mark {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .nav-links::-webkit-scrollbar { display: none; }
+
+    .nav-link {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 20px 2px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+    .nav-link:hover {
+      color: var(--text-primary);
+    }
+    .nav-link.active {
+      color: var(--accent-primary);
+      border-bottom-color: var(--accent-primary);
+      font-weight: 600;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .mobile-nav {
+      display: none;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-hairline);
+      padding: 8px 16px;
+      gap: 8px;
+      overflow-x: auto;
+    }
+
+    .container {
+      max-width: 1240px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      flex: 1;
+    }
+
+    .workspace-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 18px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .workspace-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .workspace-meta {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* Buttons & Inputs */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      text-decoration: none;
+    }
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .btn-primary {
+      background: var(--accent-primary);
+      color: #ffffff;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--accent-primary-hover);
+    }
+    .btn-dark {
+      background: var(--accent-dark);
+      color: #ffffff;
+    }
+    .btn-dark:hover:not(:disabled) {
+      background: #1e293b;
+    }
+    .btn-outline {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+    .btn-outline:hover:not(:disabled) {
+      background: var(--bg-subtle);
+    }
+    .btn-amber {
+      background: #d97706;
+      color: #ffffff;
+    }
+    .btn-amber:hover:not(:disabled) {
+      background: #b45309;
+    }
+    .btn-danger-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      padding: 6px 8px;
+    }
+    .btn-danger-ghost:hover:not(:disabled) {
+      color: var(--status-red);
+      background: var(--status-red-bg);
+    }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .input, .select, .textarea {
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 13.5px;
+      color: var(--text-primary);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .input:focus, .select:focus, .textarea:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.15);
+    }
+    .label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 5px;
+    }
+
+    /* Cards & Grids */
+    .surface {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+    }
+    .surface-pad {
+      padding: 20px 24px;
+    }
+    .surface-head {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-hairline);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-grid-5 {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+    }
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .kpi-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin-top: 6px;
+      color: var(--text-primary);
+    }
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .split-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 24px;
+      align-items: start;
+    }
+    .col-span-7 { grid-column: span 7; }
+    .col-span-5 { grid-column: span 5; }
+    .col-span-8 { grid-column: span 8; }
+    .col-span-4 { grid-column: span 4; }
+    .col-span-6 { grid-column: span 6; }
+
+    /* Segmented Filter Controls */
+    .seg-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px;
+      background: var(--bg-subtle);
+      border-radius: var(--radius-md);
+    }
+    .seg-btn {
+      border: none;
+      background: transparent;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .seg-btn.active {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Tables */
+    .table-wrap {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th {
+      padding: 11px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border-hairline);
+      white-space: nowrap;
+    }
+    td {
+      padding: 12px 14px;
+      font-size: 13.5px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    tr.clickable { cursor: pointer; }
+    tr.clickable:hover td { background: #f8fafc; }
+    tr.row-selected td { background: #eff6ff; }
+    tr.row-changed td { background: #fef3c7; }
+    tr.row-changed:hover td { background: #fde68a; }
+
+    .text-right { text-align: right; }
+    .text-green { color: var(--status-green); }
+    .text-amber { color: var(--status-amber); }
+    .text-red { color: var(--status-red); }
+    .text-blue { color: var(--accent-primary); }
+
+    /* Alerts */
+    .alert {
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid;
+      margin-bottom: 16px;
+    }
+    .alert-ok {
+      background: var(--status-green-bg);
+      border-color: var(--status-green-border);
+      color: var(--status-green);
+    }
+    .alert-err {
+      background: var(--status-red-bg);
+      border-color: var(--status-red-border);
+      color: var(--status-red);
+    }
+    .alert-warn {
+      background: var(--status-amber-bg);
+      border-color: var(--status-amber-border);
+      color: var(--status-amber);
+    }
+
+    /* Auth Screen */
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+    .auth-grid {
+      max-width: 980px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+    .auth-hero {
+      background: #0f172a;
+      color: #f8fafc;
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .auth-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+    }
+
+    /* Whisper Chat */
+    .whisper-shell {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      min-height: 540px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .whisper-threads {
+      border-right: 1px solid var(--border-hairline);
+      display: flex;
+      flex-direction: column;
+    }
+    .whisper-thread-item {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #f1f5f9;
+      padding: 14px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .whisper-thread-item:hover { background: #f8fafc; }
+    .whisper-thread-item.active { background: #eff6ff; }
+    .whisper-pane {
+      display: flex;
+      flex-direction: column;
+      background: #f8fafc;
+    }
+    .whisper-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      max-height: 410px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .msg-row {
+      display: flex;
+      flex-direction: column;
+    }
+    .msg-row.mine { align-items: flex-end; }
+    .msg-row.theirs { align-items: flex-start; }
+    .msg-bubble-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      max-width: 80%;
+    }
+    .msg-row.mine .msg-bubble-wrap { flex-direction: row-reverse; }
+    .msg-bubble {
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .msg-row.mine .msg-bubble {
+      background: var(--accent-primary);
+      color: #ffffff;
+    }
+    .msg-row.theirs .msg-bubble {
+      background: #ffffff;
+      border: 1px solid var(--border-hairline);
+      color: var(--text-primary);
+    }
+    .msg-meta {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      padding-bottom: 2px;
+    }
+    .msg-row.mine .msg-meta { align-items: flex-end; }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 60;
+    }
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      max-width: 760px;
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .kpi-grid, .kpi-grid-5 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .split-12 { grid-template-columns: 1fr; }
+      .col-span-7, .col-span-5, .col-span-8, .col-span-4, .col-span-6 { grid-column: span 1; }
+      .auth-grid { grid-template-columns: 1fr; }
+      .whisper-shell { grid-template-columns: 1fr; }
+      .whisper-threads { border-right: none; border-bottom: 1px solid var(--border-hairline); max-height: 220px; overflow-y: auto; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .mobile-nav { display: flex; }
+      .topbar { padding: 0 16px; gap: 12px; }
+      .container { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script id="app-script">
+  (function () {
+    'use strict';
+
+    const STORAGE_KEY = 'myeonhak_maru_v1_store';
+    const SESSION_KEY = 'myeonhak_maru_v1_session';
+    const IDB_NAME = 'myeonhak_maru_media';
+    const IDB_STORE = 'blobs';
+
+    // Pure JS SHA-256 fallback so hashing works even under strict file:// contexts
+    function sha256Fallback(ascii) {
+      function rightRotate(value, amount) { return (value >>> amount) | (value << (32 - amount)); }
+      const mathPow = Math.pow;
+      const maxWord = mathPow(2, 32);
+      const lengthProperty = 'length';
+      let i, j, result = '';
+      const words = [];
+      const asciiBitLength = ascii[lengthProperty] * 8;
+      let hash = [], k = [];
+      let primeCounter = 0;
+      const isComposite = {};
+      for (let candidate = 2; primeCounter < 64; candidate++) {
+        if (!isComposite[candidate]) {
+          for (i = 0; i < 313; i += candidate) isComposite[i] = candidate;
+          hash[primeCounter] = (mathPow(candidate, 0.5) * maxWord) | 0;
+          k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
+        }
+      }
+      ascii += '\x80';
+      while ((ascii[lengthProperty] % 64) - 56) ascii += '\x00';
+      for (i = 0; i < ascii[lengthProperty]; i++) {
+        j = ascii.charCodeAt(i);
+        if (j >> 8) return '';
+        words[i >> 2] |= j << (((3 - i) % 4) * 8);
+      }
+      words[words[lengthProperty]] = (asciiBitLength / maxWord) | 0;
+      words[words[lengthProperty]] = asciiBitLength;
+      for (j = 0; j < words[lengthProperty]; ) {
+        const w = words.slice(j, (j += 16));
+        const oldHash = hash;
+        hash = hash.slice(0, 8);
+        for (i = 0; i < 64; i++) {
+          const w15 = w[i - 15], w2 = w[i - 2];
+          const a = hash[0], e = hash[4];
+          const temp1 = hash[7] + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25)) + ((e & hash[5]) ^ (~e & hash[6])) + k[i] +
+            (w[i] = i < 16 ? w[i] : (w[i - 16] + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3)) + w[i - 7] + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))) | 0);
+          const temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22)) + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+          hash = [(temp1 + temp2) | 0].concat(hash);
+          hash[4] = (hash[4] + temp1) | 0;
+        }
+        for (i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+      }
+      for (i = 0; i < 8; i++) {
+        for (j = 3; j + 1; j--) {
+          const b = (hash[i] >> (j * 8)) & 255;
+          result += (b < 16 ? 0 : '') + b.toString(16);
+        }
+      }
+      return result;
+    }
+
+    async function sha256Hex(str) {
+      if (window.crypto && window.crypto.subtle) {
+        try {
+          const bytes = new TextEncoder().encode(str);
+          const buf = await window.crypto.subtle.digest('SHA-256', bytes);
+          return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+        } catch (e) {
+          // fall back
+        }
+      }
+      const utf8 = unescape(encodeURIComponent(str));
+      return sha256Fallback(utf8);
+    }
+
+    function randomId(prefix) {
+      return prefix + '-' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+    }
+
+    async function hashPassword(password) {
+      const salt = randomId('s');
+      const digest = await sha256Hex(salt + ':' + password);
+      return salt + ':' + digest;
+    }
+
+    async function verifyPassword(password, stored) {
+      const parts = String(stored || '').split(':');
+      if (parts.length !== 2) return false;
+      const digest = await sha256Hex(parts[0] + ':' + password);
+      return digest === parts[1];
+    }
+
+    // IndexedDB Media Store (for photos & videos so localStorage never overflows)
+    const mediaUrlCache = new Map();
+
+    function openMediaDb() {
+      return new Promise((resolve, reject) => {
+        if (!window.indexedDB) {
+          reject(new Error('IndexedDB unavailable'));
+          return;
+        }
+        const req = indexedDB.open(IDB_NAME, 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(IDB_STORE)) {
+            db.createObjectStore(IDB_STORE);
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function saveMediaBlob(id, blob) {
+      try {
+        const db = await openMediaDb();
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction(IDB_STORE, 'readwrite');
+          tx.objectStore(IDB_STORE).put(blob, id);
+          tx.oncomplete = resolve;
+          tx.onerror = () => reject(tx.error);
+        });
+        mediaUrlCache.set(id, URL.createObjectURL(blob));
+        return true;
+      } catch (e) {
+        // Fallback: store small dataUrl in cache/store
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            mediaUrlCache.set(id, String(reader.result));
+            resolve(true);
+          };
+          reader.readAsDataURL(blob);
+        });
+      }
+    }
+
+    async function hydrateAllMediaUrls(store) {
+      const ids = [];
+      store.notices.forEach(n => (n.attachments || []).forEach(a => ids.push(a.id)));
+      store.attendanceCheckins.forEach(c => ids.push(c.mediaId));
+      const missing = ids.filter(id => id && !mediaUrlCache.has(id));
+      if (missing.length === 0) return false;
+      try {
+        const db = await openMediaDb();
+        let loaded = false;
+        await Promise.all(missing.map(id => new Promise((resolve) => {
+          const tx = db.transaction(IDB_STORE, 'readonly');
+          const req = tx.objectStore(IDB_STORE).get(id);
+          req.onsuccess = () => {
+            if (req.result) {
+              mediaUrlCache.set(id, URL.createObjectURL(req.result));
+              loaded = true;
+            }
+            resolve();
+          };
+          req.onerror = () => resolve();
+        })));
+        return loaded;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    // Security helper: escape HTML before rendering
+    function esc(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function isoDaysAgo(days, hour, minute) {
+      const d = new Date(Date.now() - days * 86400000);
+      d.setHours(hour, minute, 0, 0);
+      return d.toISOString();
+    }
+
+    function formatKstDateTime(iso) {
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return String(iso || '');
+      return new Intl.DateTimeFormat('ko-KR', {
+        timeZone: 'Asia/Seoul',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).format(d);
+    }
+
+    function formatKstTime(iso) {
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return String(iso || '');
+      return new Intl.DateTimeFormat('ko-KR', {
+        timeZone: 'Asia/Seoul',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).format(d);
+    }
+
+    function getKstMinutes() {
+      const formatted = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Seoul',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).format(new Date());
+      const parts = formatted.split(':').map(Number);
+      return (parts[0] || 0) * 60 + (parts[1] || 0);
+    }
+
+    function isPastDeadline(config) {
+      if (!config.deadlineEnabled) return false;
+      const m = /^(\d{2}):(\d{2})$/.exec(String(config.extraStudyDeadline || '').trim());
+      const deadlineMin = m ? Number(m[1]) * 60 + Number(m[2]) : 24 * 60;
+      const nowMin = getKstMinutes();
+      if (deadlineMin >= 12 * 60) {
+        return nowMin >= deadlineMin || nowMin < 6 * 60;
+      }
+      if (nowMin >= 12 * 60) return false;
+      return nowMin >= deadlineMin;
+    }
+
+    function choiceLabel(c) {
+      if (c === '1am') return '새벽 1시까지';
+      if (c === '2am') return '새벽 2시까지';
+      return '미신청 (불참)';
+    }
+
+    function createInitialStore() {
+      const students = [
+        { id: 'stu-1', name: '김민준', room: '301호', grade: '2학년', createdAt: isoDaysAgo(14, 9, 0) },
+        { id: 'stu-2', name: '이서윤', room: '302호', grade: '2학년', createdAt: isoDaysAgo(14, 9, 0) },
+        { id: 'stu-3', name: '박도윤', room: '304호', grade: '3학년', createdAt: isoDaysAgo(14, 9, 0) },
+        { id: 'stu-4', name: '최하은', room: '401호', grade: '2학년', createdAt: isoDaysAgo(14, 9, 0) },
+        { id: 'stu-5', name: '정우진', room: '402호', grade: '3학년', createdAt: isoDaysAgo(14, 9, 0) },
+        { id: 'stu-6', name: '강지우', room: '403호', grade: '1학년', createdAt: isoDaysAgo(14, 9, 0) },
+        { id: 'stu-7', name: '조현우', room: '405호', grade: '2학년', createdAt: isoDaysAgo(14, 9, 0) },
+        { id: 'stu-8', name: '윤채원', room: '305호', grade: '1학년', createdAt: isoDaysAgo(14, 9, 0) }
+      ];
+
+      const behaviorLogs = [
+        { id: 'log-1', studentId: 'stu-3', studentName: '박도윤', category: 'drowsiness', label: '면학 중 졸음', type: 'drowsy', pointsDelta: -1, note: '2교시 21:40 엎드려 취침', recordedByName: '총괄 반장', recordedAt: isoDaysAgo(5, 21, 40) },
+        { id: 'log-2', studentId: 'stu-3', studentName: '박도윤', category: 'drowsiness', label: '면학 중 졸음', type: 'drowsy', pointsDelta: -1, note: '집중력 저하로 15분 이상 졸음', recordedByName: '총괄 반장', recordedAt: isoDaysAgo(3, 22, 15) },
+        { id: 'log-3', studentId: 'stu-3', studentName: '박도윤', category: 'drowsiness', label: '면학 중 졸음', type: 'drowsy', pointsDelta: -1, note: '3회 누적 — 추가면학 제한 적용', recordedByName: '총괄 반장', recordedAt: isoDaysAgo(1, 22, 50) },
+        { id: 'log-4', studentId: 'stu-1', studentName: '김민준', category: 'merit_study', label: '모범 면학 태도', type: 'merit', pointsDelta: 3, note: '주간 자율면학 정숙 및 모범', recordedByName: '3층 방장', recordedAt: isoDaysAgo(4, 23, 0) },
+        { id: 'log-5', studentId: 'stu-1', studentName: '김민준', category: 'drowsiness', label: '면학 중 졸음', type: 'drowsy', pointsDelta: -1, note: '피로 누적으로 잠깐 졸음', recordedByName: '3층 방장', recordedAt: isoDaysAgo(2, 23, 10) },
+        { id: 'log-6', studentId: 'stu-1', studentName: '김민준', category: 'merit_service', label: '면학실 환기·정리 봉사', type: 'merit', pointsDelta: 2, note: '쉬는 시간 창문 환기 및 책상 정리', recordedByName: '총괄 반장', recordedAt: isoDaysAgo(1, 21, 5) },
+        { id: 'log-7', studentId: 'stu-5', studentName: '정우진', category: 'phone', label: '휴대폰 무단 사용', type: 'demerit', pointsDelta: -3, note: '면학 1교시 중 휴대폰 미제출 사용', recordedByName: '4층 방장', recordedAt: isoDaysAgo(3, 20, 45) },
+        { id: 'log-8', studentId: 'stu-5', studentName: '정우진', category: 'drowsiness', label: '면학 중 졸음', type: 'drowsy', pointsDelta: -1, note: '추가면학 2차시 졸음', recordedByName: '4층 방장', recordedAt: isoDaysAgo(2, 23, 40) },
+        { id: 'log-9', studentId: 'stu-5', studentName: '정우진', category: 'drowsiness', label: '면학 중 졸음', type: 'drowsy', pointsDelta: -1, note: '2회 누적 (제한 기준 1회 남음)', recordedByName: '4층 방장', recordedAt: isoDaysAgo(1, 22, 20) },
+        { id: 'log-10', studentId: 'stu-2', studentName: '이서윤', category: 'merit_study', label: '모범 면학 태도', type: 'merit', pointsDelta: 3, note: '한 주간 지각·졸음 없이 성실 참여', recordedByName: '3층 방장', recordedAt: isoDaysAgo(2, 22, 55) },
+        { id: 'log-11', studentId: 'stu-4', studentName: '최하은', category: 'noise', label: '면학실 내 소음·잡담', type: 'demerit', pointsDelta: -2, note: '입실 후 자리 정돈 지연 및 대화', recordedByName: '4층 방장', recordedAt: isoDaysAgo(2, 20, 10) },
+        { id: 'log-12', studentId: 'stu-4', studentName: '최하은', category: 'merit_service', label: '환기·청소 봉사', type: 'merit', pointsDelta: 2, note: '분리수거 및 책장 정리', recordedByName: '4층 방장', recordedAt: isoDaysAgo(1, 19, 50) }
+      ];
+
+      const extraStudyApplications = [
+        { studentId: 'stu-1', studentName: '김민준', room: '301호', choice: '2am', previousChoice: '1am', isChanged: true, changedAt: isoDaysAgo(0, 21, 15), acknowledgedBy: null, acknowledgedAt: null, updatedAt: isoDaysAgo(0, 21, 15) },
+        { studentId: 'stu-2', studentName: '이서윤', room: '302호', choice: '1am', previousChoice: null, isChanged: false, changedAt: null, acknowledgedBy: null, acknowledgedAt: null, updatedAt: isoDaysAgo(0, 20, 5) },
+        { studentId: 'stu-3', studentName: '박도윤', room: '304호', choice: 'none', previousChoice: null, isChanged: false, changedAt: null, acknowledgedBy: null, acknowledgedAt: null, updatedAt: isoDaysAgo(0, 19, 30) },
+        { studentId: 'stu-4', studentName: '최하은', room: '401호', choice: 'none', previousChoice: '1am', isChanged: true, changedAt: isoDaysAgo(0, 21, 42), acknowledgedBy: null, acknowledgedAt: null, updatedAt: isoDaysAgo(0, 21, 42) },
+        { studentId: 'stu-5', studentName: '정우진', room: '402호', choice: '1am', previousChoice: null, isChanged: false, changedAt: null, acknowledgedBy: null, acknowledgedAt: null, updatedAt: isoDaysAgo(0, 20, 18) },
+        { studentId: 'stu-6', studentName: '강지우', room: '403호', choice: '2am', previousChoice: null, isChanged: false, changedAt: null, acknowledgedBy: null, acknowledgedAt: null, updatedAt: isoDaysAgo(0, 20, 25) },
+        { studentId: 'stu-7', studentName: '조현우', room: '405호', choice: 'none', previousChoice: null, isChanged: false, changedAt: null, acknowledgedBy: null, acknowledgedAt: null, updatedAt: isoDaysAgo(0, 19, 45) },
+        { studentId: 'stu-8', studentName: '윤채원', room: '305호', choice: '1am', previousChoice: null, isChanged: false, changedAt: null, acknowledgedBy: null, acknowledgedAt: null, updatedAt: isoDaysAgo(0, 20, 10) }
+      ];
+
+      const notices = [
+        {
+          id: 'notice-1',
+          title: '이번 주 면학실 집중 환기 시간 및 추가 면학 신청 안내',
+          content: '면학 1교시 종료 후(21:20~21:30) 10분간 전 층 면학실 출입문과 창문을 개방하여 환기를 진행합니다.\n추가 면학(새벽 1시 / 2시) 신청 및 변경은 마감 시간 전까지 앱에서 직접 선택해 주세요. 변경 시 방장 확인이 완료되면 강조 표시가 해제됩니다.',
+          scheduleDate: '2026-11-27',
+          authorName: '이도현',
+          authorTitle: '총괄 반장',
+          attachments: [],
+          createdAt: isoDaysAgo(1, 18, 20)
+        },
+        {
+          id: 'notice-2',
+          title: '공휴일 학원 외출 시 현장 출석 인증 방법 공지',
+          content: '공휴일에 학원 자습을 가는 학생은 학원 도착 직후 [출석 인증] 탭에서 실시간 카메라 촬영을 진행해 주세요. 촬영 시각과 GPS 위치가 화면과 사진에 함께 봉인됩니다.',
+          scheduleDate: '2026-11-29',
+          authorName: '김서연',
+          authorTitle: '4층 방장',
+          attachments: [],
+          createdAt: isoDaysAgo(0, 16, 10)
+        }
+      ];
+
+      const customMetrics = [
+        { id: 'metric-temp', name: '실내 온도', unit: '°C', type: 'number' },
+        { id: 'metric-humidity', name: '상대 습도', unit: '%', type: 'number' }
+      ];
+
+      const researchLogs = [
+        { id: 'res-1', recordedAt: isoDaysAgo(5, 20, 0), sessionLabel: '1교시 시작 (환기 직후)', co2Ppm: 620, totalStudents: 32, drowsyStudents: 1, drowsyRate: 3.1, doorVentilation: 'open', customValues: { 'metric-temp': 21.8, 'metric-humidity': 46 }, note: '출입문 개방 후 10분 환기 완료', recordedBy: '연구 담당' },
+        { id: 'res-2', recordedAt: isoDaysAgo(5, 21, 30), sessionLabel: '1교시 종료 (문 닫힘)', co2Ppm: 1280, totalStudents: 32, drowsyStudents: 5, drowsyRate: 15.6, doorVentilation: 'closed', customValues: { 'metric-temp': 23.4, 'metric-humidity': 53 }, note: '출입문 밀폐 유지', recordedBy: '연구 담당' },
+        { id: 'res-3', recordedAt: isoDaysAgo(4, 22, 40), sessionLabel: '2교시 후반 (고농도)', co2Ppm: 1890, totalStudents: 30, drowsyStudents: 11, drowsyRate: 36.7, doorVentilation: 'closed', customValues: { 'metric-temp': 24.9, 'metric-humidity': 59 }, note: 'CO2 1800ppm 초과, 다수 졸음', recordedBy: '연구 담당' },
+        { id: 'res-4', recordedAt: isoDaysAgo(3, 21, 10), sessionLabel: '부분 환기 실험', co2Ppm: 980, totalStudents: 31, drowsyStudents: 3, drowsyRate: 9.7, doorVentilation: 'partial', customValues: { 'metric-temp': 22.3, 'metric-humidity': 49 }, note: '출입문 15cm 고정 개방', recordedBy: '연구 담당' },
+        { id: 'res-5', recordedAt: isoDaysAgo(2, 22, 15), sessionLabel: '2교시 중반 (밀폐)', co2Ppm: 1640, totalStudents: 28, drowsyStudents: 8, drowsyRate: 28.6, doorVentilation: 'closed', customValues: { 'metric-temp': 24.2, 'metric-humidity': 56 }, note: '난방 가동 중 문 닫힘', recordedBy: '연구 담당' },
+        { id: 'res-6', recordedAt: isoDaysAgo(1, 20, 30), sessionLabel: '상시 환기 테스트', co2Ppm: 760, totalStudents: 29, drowsyStudents: 2, drowsyRate: 6.9, doorVentilation: 'open', customValues: { 'metric-temp': 21.5, 'metric-humidity': 45 }, note: '복도 측 출입문 상시 개방', recordedBy: '연구 담당' },
+        { id: 'res-7', recordedAt: isoDaysAgo(1, 23, 10), sessionLabel: '추가면학 1차시', co2Ppm: 1450, totalStudents: 20, drowsyStudents: 5, drowsyRate: 25.0, doorVentilation: 'closed', customValues: { 'metric-temp': 23.8, 'metric-humidity': 54 }, note: '심야 시간대 환기 미실시', recordedBy: '연구 담당' },
+        { id: 'res-8', recordedAt: isoDaysAgo(0, 21, 50), sessionLabel: '금일 2교시 중간 점검', co2Ppm: 1120, totalStudents: 30, drowsyStudents: 4, drowsyRate: 13.3, doorVentilation: 'partial', customValues: { 'metric-temp': 22.9, 'metric-humidity': 51 }, note: '쉬는 시간 5분 환기 후 부분 개방', recordedBy: '연구 담당' }
+      ];
+
+      return {
+        config: { maxDrowsyLimit: 3, extraStudyDeadline: '24:00', deadlineEnabled: true },
+        users: [],
+        students,
+        behaviorLogs,
+        extraStudyApplications,
+        notices,
+        attendanceCheckins: [],
+        whisperMessages: [],
+        customMetrics,
+        researchLogs
+      };
+    }
+
+    function loadStore() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          const initial = createInitialStore();
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+          return initial;
+        }
+        return JSON.parse(raw);
+      } catch (e) {
+        return createInitialStore();
+      }
+    }
+
+    function saveStore() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.store));
+      } catch (e) {
+        console.error('Storage save failed:', e);
+      }
+    }
+
+    // Application State
+    const state = {
+      store: loadStore(),
+      currentUserId: sessionStorage.getItem(SESSION_KEY) || null,
+      authTab: 'login',
+      authError: null,
+      activeTab: 'overview',
+      feedback: null,
+      // Overview UI state
+      overviewSearch: '',
+      overviewFilter: 'all',
+      selectedStudentId: null,
+      hoveredScoreLogId: null,
+      // Extra study UI state
+      extraFilter: 'all',
+      // Notice UI state
+      lightboxUrl: null,
+      // Attendance camera & GPS state
+      cameraActive: false,
+      cameraError: null,
+      mediaStream: null,
+      geo: { status: 'idle', lat: null, lng: null, acc: null, label: '위치 확인 대기 중', err: null },
+      // Whisper UI state
+      whisperPartnerId: null,
+      // Research UI state
+      graphType: 'scatter',
+      xAxisKey: 'co2Ppm',
+      yAxisKey: 'drowsyRate',
+      hoveredResearchId: null,
+      // Modal
+      showMemberModal: false
+    };
+
+    function getCurrentUser() {
+      if (!state.currentUserId) return null;
+      return state.store.users.find(u => u.id === state.currentUserId) || null;
+    }
+
+    function setCurrentUser(userId) {
+      state.currentUserId = userId;
+      if (userId) {
+        sessionStorage.setItem(SESSION_KEY, userId);
+      } else {
+        sessionStorage.removeItem(SESSION_KEY);
+      }
+    }
+
+    function getDrowsyCount(studentId) {
+      return state.store.behaviorLogs.filter(l => l.studentId === studentId && l.type === 'drowsy').length;
+    }
+
+    function setFeedback(type, text) {
+      state.feedback = { type, text };
+    }
+
+    // Download clean standalone single-file index.html for GitHub / Vercel
+    function downloadStandaloneIndexHtml() {
+      const styles = document.getElementById('app-styles')?.textContent || '';
+      const script = document.getElementById('app-script')?.textContent || '';
+      const html = [
+        '<!doctype html>',
+        '<html lang="ko">',
+        '<head>',
+        '  <meta charset="UTF-8" />',
+        '  <meta name="viewport" content="width=device-width, initial-scale=1.0" />',
+        '  <title>면학마루 — 기숙사 면학실 통합 관리 및 환경 연구 시스템</title>',
+        '  <meta name="description" content="기숙사 면학시간 졸음·상벌점 관리, 추가 면학 신청, 방장 공지 게시판, 공휴일 출석 위치·시각 인증, 1:1 귓속말 및 이산화탄소 상관관계 연구 플랫폼" />',
+        '  <link rel="preconnect" href="https://fonts.googleapis.com" />',
+        '  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />',
+        '  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet" />',
+        '  <style id="app-styles">' + styles + '</style>',
+        '</head>',
+        '<body>',
+        '  <div id="app"></div>',
+        '  <script id="app-script">' + script + '<\/script>',
+        '</body>',
+        '</html>'
+      ].join('\n');
+
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'index.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Inline SVG Icons
+    function svgIcon(name, size) {
+      const s = size || 16;
+      const paths = {
+        download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+        users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+        logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+        ban: '<circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>',
+        checkCircle: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+        check: '<polyline points="20 6 9 17 4 12"/>',
+        alert: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+        clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+        camera: '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
+        pin: '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+        lock: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+        trash: '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>',
+        send: '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+        plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+        x: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'
+      };
+      return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">${paths[name] || ''}</svg>`;
+    }
+
+    // ==================== AUTH VIEW ====================
+    function renderAuth() {
+      const needsBootstrap = state.store.users.length === 0;
+      const isRegister = !needsBootstrap && state.authTab === 'register';
+      return `
+        <div class="auth-page">
+          <div style="width:100%;max-width:980px">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+              <button type="button" class="btn btn-outline btn-sm" data-action="download-html">
+                ${svgIcon('download', 14)}
+                <span>index.html 다운로드 (GitHub/Vercel용)</span>
+              </button>
+            </div>
+            <div class="auth-grid">
+              <div class="auth-hero">
+                <div>
+                  <div style="font-size:12px;font-weight:600;color:#93c5fd">기숙사 면학실 운영 플랫폼</div>
+                  <h1 style="font-size:30px;font-weight:700;margin-top:10px;color:#ffffff">면학마루</h1>
+                  <p style="font-size:14px;color:#cbd5e1;margin-top:14px;line-height:1.65">
+                    면학시간 졸음·상벌점 관리, 추가 면학(1시/2시) 신청 및 변경 확인, 다중 방장 공지 게시판,
+                    공휴일 학원 출석 시각·위치 인증, 방장 1:1 귓속말 및 이산화탄소 농도 상관관계 연구를
+                    단일 index.html 파일 하나로 어디서나 바로 실행할 수 있습니다.
+                  </p>
+                </div>
+                <div style="margin-top:32px;padding-top:20px;border-top:1px solid #1e293b;font-size:12px;color:#94a3b8;display:flex;flex-direction:column;gap:8px">
+                  <div>· 반장·방장, 학생, 지정 연구원별 역할 기반 화면 및 기능 분리</div>
+                  <div>· 브라우저 더블 클릭 실행 및 GitHub → Vercel 즉시 배포 지원</div>
+                </div>
+              </div>
+
+              <div class="auth-box">
+                ${needsBootstrap ? `
+                  <h2 style="font-size:20px;font-weight:700">최초 관리자(반장·연구원) 계정 설정</h2>
+                  <p style="font-size:13px;color:var(--text-muted);margin-top:6px">
+                    처음 실행되었습니다. 총괄 반장 및 CO₂ 연구 권한을 가진 관리자 계정을 먼저 생성하세요.
+                  </p>
+                ` : `
+                  <div class="seg-group" style="margin-bottom:18px">
+                    <button type="button" class="seg-btn ${state.authTab === 'login' ? 'active' : ''}" data-action="auth-tab" data-tab="login">로그인</button>
+                    <button type="button" class="seg-btn ${state.authTab === 'register' ? 'active' : ''}" data-action="auth-tab" data-tab="register">학생 회원가입</button>
+                  </div>
+                  <h2 style="font-size:20px;font-weight:700">${isRegister ? '학생 계정 등록' : '계정 로그인'}</h2>
+                  <p style="font-size:13px;color:var(--text-muted);margin-top:4px">
+                    ${isRegister ? '본인 이름과 호실을 입력해 학생 계정을 생성합니다.' : '생성한 반장 또는 학생 계정으로 로그인하세요.'}
+                  </p>
+                `}
+
+                <form id="auth-form" style="margin-top:20px;display:flex;flex-direction:column;gap:14px">
+                  ${(needsBootstrap || isRegister) ? `
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                      <div>
+                        <label class="label">실명 (이름)</label>
+                        <input class="input" name="name" required placeholder="예: ${needsBootstrap ? '이도현' : '김민준'}" />
+                      </div>
+                      ${needsBootstrap ? `
+                        <div>
+                          <label class="label">직책 표시명</label>
+                          <input class="input" name="title" required value="총괄 반장" />
+                        </div>
+                      ` : `
+                        <div>
+                          <label class="label">호실</label>
+                          <input class="input" name="room" required placeholder="예: 301호" />
+                        </div>
+                      `}
+                    </div>
+                  ` : ''}
+
+                  ${isRegister ? `
+                    <div>
+                      <label class="label">학년</label>
+                      <select class="select" name="grade">
+                        <option value="1학년">1학년</option>
+                        <option value="2학년" selected>2학년</option>
+                        <option value="3학년">3학년</option>
+                      </select>
+                    </div>
+                  ` : ''}
+
+                  <div>
+                    <label class="label">${!needsBootstrap && !isRegister ? '아이디 또는 실명' : '로그인 아이디'}</label>
+                    <input class="input" name="username" required placeholder="${!needsBootstrap && !isRegister ? '아이디 또는 실명 입력' : '2자 이상 입력'}" />
+                  </div>
+
+                  <div>
+                    <label class="label">비밀번호</label>
+                    <input class="input" type="password" name="password" required minlength="4" placeholder="4자 이상 입력" />
+                  </div>
+
+                  ${(needsBootstrap || isRegister) ? `
+                    <div>
+                      <label class="label">비밀번호 확인</label>
+                      <input class="input" type="password" name="confirmPassword" required minlength="4" placeholder="비밀번호 재입력" />
+                    </div>
+                  ` : ''}
+
+                  ${state.authError ? `<div class="alert alert-err" style="margin-bottom:0">${esc(state.authError)}</div>` : ''}
+
+                  <button type="submit" class="btn btn-primary" style="width:100%;padding:10px 16px">
+                    ${needsBootstrap ? '초기 관리자 계정 생성 후 시작' : isRegister ? '학생 계정 등록' : '로그인'}
+                  </button>
+                </form>
+
+                ${!needsBootstrap && state.store.users.length > 0 ? `
+                  <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border-hairline);font-size:12px;color:var(--text-muted)">
+                    등록된 계정: ${state.store.users.map(u => `${esc(u.name)}(@${esc(u.username)})`).join(' · ')}
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ==================== TAB 1: OVERVIEW (DROWSINESS & MERIT/DEMERIT) ====================
+    function computeStudentStats() {
+      const limit = state.store.config.maxDrowsyLimit;
+      return state.store.students.map(stu => {
+        const logs = state.store.behaviorLogs
+          .filter(l => l.studentId === stu.id)
+          .slice()
+          .sort((a, b) => new Date(a.recordedAt).getTime() - new Date(b.recordedAt).getTime());
+
+        const drowsyCount = logs.filter(l => l.type === 'drowsy').length;
+        const otherLogs = logs.filter(l => l.type === 'demerit');
+        const meritLogs = logs.filter(l => l.type === 'merit');
+        const totalMerit = meritLogs.reduce((s, l) => s + Math.max(0, l.pointsDelta), 0);
+        const totalDemerit = logs.filter(l => l.pointsDelta < 0).reduce((s, l) => s + Math.abs(l.pointsDelta), 0);
+        const netScore = totalMerit - totalDemerit;
+        const issueCounts = {};
+        otherLogs.forEach(l => {
+          issueCounts[l.label] = (issueCounts[l.label] || 0) + 1;
+        });
+
+        return {
+          student: stu,
+          logs,
+          drowsyCount,
+          otherCount: otherLogs.length,
+          issueCounts,
+          totalMerit,
+          totalDemerit,
+          netScore,
+          isBlocked: drowsyCount >= limit
+        };
+      });
+    }
+
+    function renderScoreTrendSvg(logs) {
+      if (logs.length === 0) {
+        return `<div style="height:160px;border:1px dashed var(--border-strong);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-muted)">아직 기록된 상·벌점 내역이 없습니다.</div>`;
+      }
+
+      let runMerit = 0, runDemerit = 0;
+      const points = logs.map((log, idx) => {
+        if (log.pointsDelta >= 0) runMerit += log.pointsDelta;
+        else runDemerit += Math.abs(log.pointsDelta);
+        return { idx, log, net: runMerit - runDemerit };
+      });
+
+      const w = 460, h = 185, pL = 36, pR = 16, pT = 18, pB = 26;
+      const plotW = w - pL - pR, plotH = h - pT - pB;
+      const nets = points.map(p => p.net);
+      const minY = Math.min(0, ...nets) - 1;
+      const maxY = Math.max(2, ...nets) + 1;
+      const spanY = Math.max(1, maxY - minY);
+
+      const gx = i => points.length === 1 ? pL + plotW / 2 : pL + (i / (points.length - 1)) * plotW;
+      const gy = v => pT + ((maxY - v) / spanY) * plotH;
+      const zeroY = gy(0);
+      const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${gx(i).toFixed(1)} ${gy(p.net).toFixed(1)}`).join(' ');
+      const hovered = points.find(p => p.log.id === state.hoveredScoreLogId) || null;
+
+      return `
+        <div style="border:1px solid var(--border-hairline);border-radius:8px;background:#f8fafc;padding:8px">
+          <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:175px;overflow:visible">
+            <line x1="${pL}" y1="${zeroY}" x2="${w - pR}" y2="${zeroY}" stroke="#94a3b8" stroke-dasharray="3 3" stroke-width="1" />
+            <text x="${pL - 6}" y="${zeroY + 3}" text-anchor="end" fill="#64748b" font-size="10" font-family="monospace">0</text>
+            <text x="${pL - 6}" y="${pT + 4}" text-anchor="end" fill="#94a3b8" font-size="10" font-family="monospace">${maxY}</text>
+            <text x="${pL - 6}" y="${h - pB}" text-anchor="end" fill="#94a3b8" font-size="10" font-family="monospace">${minY}</text>
+            ${points.length > 1 ? `<path d="${pathD}" fill="none" stroke="#1d4ed8" stroke-width="2" />` : ''}
+            ${points.map(p => {
+              const c = p.log.type === 'merit' ? '#16a34a' : p.log.type === 'drowsy' ? '#d97706' : '#dc2626';
+              const active = state.hoveredScoreLogId === p.log.id;
+              return `
+                <circle cx="${gx(p.idx)}" cy="${gy(p.net)}" r="${active ? 6 : 4.5}" fill="${c}" stroke="#fff" stroke-width="1.5"
+                  style="cursor:pointer" data-hover-score="${esc(p.log.id)}" />
+                <text x="${gx(p.idx)}" y="${h - 6}" text-anchor="middle" fill="#64748b" font-size="9" font-family="monospace">${p.idx + 1}회</text>
+              `;
+            }).join('')}
+          </svg>
+          ${hovered ? `
+            <div style="margin-top:4px;padding:8px 10px;background:#fff;border:1px solid var(--border-hairline);border-radius:6px;display:flex;justify-content:space-between;font-size:12px">
+              <span><strong>${esc(hovered.log.label)}</strong> · <span class="mono-num">${esc(formatKstDateTime(hovered.log.recordedAt))}</span></span>
+              <span class="mono-num"><strong>${hovered.log.pointsDelta > 0 ? '+' + hovered.log.pointsDelta : hovered.log.pointsDelta}점</strong> (누적 ${hovered.net > 0 ? '+' + hovered.net : hovered.net}점)</span>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function renderOverviewTab(user) {
+      const isLeader = user.role === 'leader';
+      const limit = state.store.config.maxDrowsyLimit;
+      const stats = computeStudentStats();
+      const blockedCount = stats.filter(s => s.isBlocked).length;
+      const totalDrowsy = state.store.behaviorLogs.filter(l => l.type === 'drowsy').length;
+
+      const filtered = stats.filter(item => {
+        if (state.overviewFilter === 'blocked' && !item.isBlocked) return false;
+        if (state.overviewFilter === 'ok' && item.isBlocked) return false;
+        if (state.overviewSearch.trim()) {
+          const q = state.overviewSearch.trim().toLowerCase();
+          return item.student.name.toLowerCase().includes(q) || item.student.room.toLowerCase().includes(q);
+        }
+        return true;
+      });
+
+      const defaultId = user.studentId || (stats[0] && stats[0].student.id) || '';
+      const activeId = state.selectedStudentId || defaultId;
+      const detail = stats.find(s => s.student.id === activeId) || stats[0] || null;
+
+      return `
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">전체 등록 학생</div>
+            <div class="kpi-value mono-num">${stats.length}명</div>
+            <div class="kpi-sub">기숙사 면학실 대상</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">추가면학 제한 학생</div>
+            <div class="kpi-value mono-num text-red">${blockedCount}명</div>
+            <div class="kpi-sub">졸음 ${limit}회 이상 누적</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">전체 졸음 체크</div>
+            <div class="kpi-value mono-num">${totalDrowsy}건</div>
+            <div class="kpi-sub">누적 졸음 적발 합계</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">졸음 허용 기회 설정</div>
+            ${isLeader ? `
+              <form id="limit-form" style="display:flex;align-items:center;gap:8px;margin-top:8px">
+                <input class="input mono-num" type="number" name="maxDrowsyLimit" min="1" max="20" value="${limit}" style="width:76px;padding:6px 8px" />
+                <button type="submit" class="btn btn-dark btn-sm">기준 저장</button>
+              </form>
+            ` : `<div class="kpi-value mono-num">${limit}회</div>`}
+            <div class="kpi-sub">기준 도달 시 추가면학 불가</div>
+          </div>
+        </div>
+
+        ${isLeader ? `
+          <section class="surface surface-pad" style="margin-bottom:24px">
+            <div style="padding-bottom:14px;border-bottom:1px solid #f1f5f9">
+              <h2 style="font-size:15px;font-weight:700">졸음 체크 및 상·벌점 생활 기록 입력</h2>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:3px">
+                졸음 체크 시 자동 누적되며 기준(${limit}회) 이상이면 추가면학이 제한됩니다. 기타 문제 및 상점도 함께 기록할 수 있습니다.
+              </p>
+            </div>
+            <form id="behavior-form" style="margin-top:14px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;align-items:end">
+              <div>
+                <label class="label">대상 학생</label>
+                <select class="select" name="studentId">
+                  ${state.store.students.map(s => `<option value="${esc(s.id)}">${esc(s.name)} (${esc(s.room)})</option>`).join('')}
+                </select>
+              </div>
+              <div>
+                <label class="label">항목 구분</label>
+                <select class="select" name="preset" id="behavior-preset-select">
+                  <option value="drowsy|drowsiness|면학 중 졸음|1">[졸음] 면학 중 졸음</option>
+                  <option value="demerit|noise|면학실 내 소음·잡담|2">[벌점] 면학실 소음·잡담</option>
+                  <option value="demerit|phone|휴대폰 무단 사용|3">[벌점] 휴대폰 무단 사용</option>
+                  <option value="demerit|absence|무단 이탈·지각|3">[벌점] 무단 이탈·지각</option>
+                  <option value="demerit|neatness|정리정돈 미흡|1">[벌점] 정리정돈 미흡</option>
+                  <option value="demerit|other|기타 생활 규정 위반|1">[벌점] 기타 문제</option>
+                  <option value="merit|merit_study|모범 면학 태도|3">[상점] 모범 면학 태도</option>
+                  <option value="merit|merit_service|환기·청소 봉사|2">[상점] 환기·청소 봉사</option>
+                </select>
+              </div>
+              <div>
+                <label class="label">세부 사유명</label>
+                <input class="input" name="label" id="behavior-label-input" required value="면학 중 졸음" />
+              </div>
+              <div>
+                <label class="label">점수 (점)</label>
+                <input class="input mono-num" type="number" name="pointsAbs" id="behavior-points-input" min="0" max="20" value="1" />
+              </div>
+              <div>
+                <label class="label">상세 메모</label>
+                <input class="input" name="note" placeholder="교시·상황 등" />
+              </div>
+              <div>
+                <button type="submit" class="btn btn-primary" style="width:100%">${svgIcon('plus', 15)}<span>기록 등록</span></button>
+              </div>
+            </form>
+          </section>
+        ` : ''}
+
+        <div class="split-12">
+          <section class="surface col-span-7" style="overflow:hidden">
+            <div class="surface-head">
+              <div>
+                <h2 style="font-size:15px;font-weight:700">학생별 졸음·상벌점 현황</h2>
+                <p style="font-size:12px;color:var(--text-muted);margin-top:2px">학생 이름을 클릭하면 개인 상세 이력과 점수 변화 그래프가 표시됩니다.</p>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+                <input class="input" id="overview-search-input" value="${esc(state.overviewSearch)}" placeholder="이름·호실 검색" style="width:130px;padding:6px 10px;font-size:12px" />
+                <div class="seg-group">
+                  <button type="button" class="seg-btn ${state.overviewFilter === 'all' ? 'active' : ''}" data-action="overview-filter" data-filter="all">전체</button>
+                  <button type="button" class="seg-btn ${state.overviewFilter === 'blocked' ? 'active' : ''}" data-action="overview-filter" data-filter="blocked">면학 제한</button>
+                  <button type="button" class="seg-btn ${state.overviewFilter === 'ok' ? 'active' : ''}" data-action="overview-filter" data-filter="ok">정상</button>
+                </div>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>학생</th>
+                    <th class="text-right">졸음 누적</th>
+                    <th>추가면학 상태</th>
+                    <th class="text-right">기타 문제</th>
+                    <th class="text-right">상점 / 벌점 / 총점</th>
+                    ${isLeader ? '<th class="text-right">빠른 체크</th>' : ''}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${filtered.length === 0 ? `
+                    <tr><td colspan="${isLeader ? 6 : 5}" style="text-align:center;padding:32px;color:var(--text-muted);font-size:12px">조건에 해당하는 학생이 없습니다.</td></tr>
+                  ` : filtered.map(item => `
+                    <tr class="clickable ${detail && detail.student.id === item.student.id ? 'row-selected' : ''}" data-action="select-student" data-student-id="${esc(item.student.id)}">
+                      <td>
+                        <div style="font-weight:600">${esc(item.student.name)}</div>
+                        <div style="font-size:12px;color:var(--text-muted)">${esc(item.student.room)} · ${esc(item.student.grade)}</div>
+                      </td>
+                      <td class="text-right mono-num">
+                        <strong class="${item.isBlocked ? 'text-red' : ''}">${item.drowsyCount}</strong><span style="color:var(--text-muted)"> / ${limit}회</span>
+                      </td>
+                      <td>
+                        ${item.isBlocked
+                          ? `<span class="text-red" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600">${svgIcon('ban', 14)} 추가면학 불가</span>`
+                          : `<span class="text-green" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500">${svgIcon('checkCircle', 14)} 신청 가능</span>`
+                        }
+                      </td>
+                      <td class="text-right mono-num" style="font-size:12px">${item.otherCount}회</td>
+                      <td class="text-right mono-num" style="font-size:12px">
+                        <span class="text-green">+${item.totalMerit}</span> / <span class="text-red">-${item.totalDemerit}</span> /
+                        <strong class="${item.netScore < 0 ? 'text-red' : ''}">${item.netScore > 0 ? '+' + item.netScore : item.netScore}점</strong>
+                      </td>
+                      ${isLeader ? `
+                        <td class="text-right">
+                          <button type="button" class="btn btn-outline btn-sm" data-action="quick-drowsy" data-student-id="${esc(item.student.id)}">+ 졸음 1회</button>
+                        </td>
+                      ` : ''}
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="surface surface-pad col-span-5">
+            ${detail ? `
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding-bottom:14px;border-bottom:1px solid #f1f5f9">
+                <div>
+                  <div style="font-size:12px;color:var(--text-muted)">${esc(detail.student.room)} · ${esc(detail.student.grade)}</div>
+                  <h3 style="font-size:17px;font-weight:700;margin-top:2px">${esc(detail.student.name)} 학생 개인 기록</h3>
+                </div>
+                <div style="font-size:12px;font-weight:600;padding:5px 10px;border-radius:6px;border:1px solid;${detail.isBlocked ? 'background:var(--status-red-bg);border-color:var(--status-red-border);color:var(--status-red)' : 'background:var(--status-green-bg);border-color:var(--status-green-border);color:var(--status-green)'}">
+                  ${detail.isBlocked ? '졸음 기준 초과 · 면학 제한' : '추가면학 참여 가능'}
+                </div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0;text-align:center">
+                <div style="padding:10px;background:#f8fafc;border:1px solid var(--border-hairline);border-radius:8px">
+                  <div style="font-size:11px;color:var(--text-muted)">졸음</div>
+                  <div class="mono-num" style="font-size:15px;font-weight:700;margin-top:2px">${detail.drowsyCount}/${limit}</div>
+                </div>
+                <div style="padding:10px;background:#f8fafc;border:1px solid var(--border-hairline);border-radius:8px">
+                  <div style="font-size:11px;color:var(--text-muted)">상점</div>
+                  <div class="mono-num text-green" style="font-size:15px;font-weight:700;margin-top:2px">+${detail.totalMerit}</div>
+                </div>
+                <div style="padding:10px;background:#f8fafc;border:1px solid var(--border-hairline);border-radius:8px">
+                  <div style="font-size:11px;color:var(--text-muted)">벌점</div>
+                  <div class="mono-num text-red" style="font-size:15px;font-weight:700;margin-top:2px">-${detail.totalDemerit}</div>
+                </div>
+                <div style="padding:10px;background:#f8fafc;border:1px solid var(--border-hairline);border-radius:8px">
+                  <div style="font-size:11px;color:var(--text-muted)">총점</div>
+                  <div class="mono-num ${detail.netScore >= 0 ? 'text-blue' : 'text-red'}" style="font-size:15px;font-weight:700;margin-top:2px">${detail.netScore > 0 ? '+' + detail.netScore : detail.netScore}</div>
+                </div>
+              </div>
+
+              <div style="margin-bottom:16px">
+                <div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">졸음 외 항목별 체크 횟수</div>
+                ${Object.keys(detail.issueCounts).length === 0
+                  ? '<p style="font-size:12px;color:var(--text-muted)">기타 생활 규정 위반 기록이 없습니다.</p>'
+                  : `<div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px">${Object.entries(detail.issueCounts).map(([lbl, cnt]) => `<span>${esc(lbl)} <strong class="mono-num text-red">${cnt}회</strong></span>`).join('')}</div>`
+                }
+              </div>
+
+              <div style="margin-bottom:16px">
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
+                  <strong style="color:var(--text-secondary)">상·벌점 누적 총점 변화 그래프</strong>
+                  <span style="color:var(--text-muted)">점 hover 시 시각·사유 표시</span>
+                </div>
+                ${renderScoreTrendSvg(detail.logs)}
+              </div>
+
+              <div>
+                <div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">전체 체크 시점 및 상세 내역 (${detail.logs.length}건)</div>
+                <div style="max-height:240px;overflow-y:auto;border:1px solid var(--border-hairline);border-radius:8px">
+                  ${detail.logs.length === 0 ? '<div style="padding:24px;text-align:center;font-size:12px;color:var(--text-muted)">기록이 없습니다.</div>' : detail.logs.slice().reverse().map(log => `
+                    <div style="padding:10px 12px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;font-size:12px">
+                      <div>
+                        <div>
+                          <strong class="${log.type === 'merit' ? 'text-green' : log.type === 'drowsy' ? 'text-amber' : 'text-red'}">${esc(log.label)}</strong>
+                          <span style="color:var(--text-muted)"> · </span>
+                          <strong class="mono-num">${log.pointsDelta > 0 ? '+' + log.pointsDelta : log.pointsDelta}점</strong>
+                        </div>
+                        ${log.note ? `<div style="color:var(--text-secondary);margin-top:2px">${esc(log.note)}</div>` : ''}
+                        <div class="mono-num" style="color:var(--text-muted);font-size:11px;margin-top:3px">
+                          ${esc(formatKstDateTime(log.recordedAt))} · 기록: ${esc(log.recordedByName)}
+                        </div>
+                      </div>
+                      ${isLeader ? `<button type="button" class="btn btn-danger-ghost" data-action="delete-behavior" data-log-id="${esc(log.id)}" title="삭제">${svgIcon('trash', 14)}</button>` : ''}
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : '<div style="padding:40px;text-align:center;font-size:13px;color:var(--text-muted)">학생을 선택해 주세요.</div>'}
+          </section>
+        </div>
+      `;
+    }
+
+    // ==================== TAB 2: EXTRA STUDY ====================
+    function renderExtraStudyTab(user) {
+      const isLeader = user.role === 'leader';
+      const cfg = state.store.config;
+      const deadlinePassed = isPastDeadline(cfg);
+      const rows = state.store.students.map(stu => {
+        const app = state.store.extraStudyApplications.find(a => a.studentId === stu.id) || {
+          studentId: stu.id, studentName: stu.name, room: stu.room, choice: 'none',
+          previousChoice: null, isChanged: false, changedAt: null, acknowledgedBy: null, acknowledgedAt: null, updatedAt: stu.createdAt
+        };
+        const drowsyCount = getDrowsyCount(stu.id);
+        return { student: stu, app, drowsyCount, isBlocked: drowsyCount >= cfg.maxDrowsyLimit };
+      });
+
+      const counts = {
+        total: rows.length,
+        oneAm: rows.filter(r => r.app.choice === '1am').length,
+        twoAm: rows.filter(r => r.app.choice === '2am').length,
+        none: rows.filter(r => r.app.choice === 'none').length,
+        changed: rows.filter(r => r.app.isChanged).length
+      };
+
+      const filtered = rows.filter(r => {
+        if (state.extraFilter === 'changed') return r.app.isChanged;
+        if (state.extraFilter === '1am') return r.app.choice === '1am';
+        if (state.extraFilter === '2am') return r.app.choice === '2am';
+        if (state.extraFilter === 'none') return r.app.choice === 'none';
+        return true;
+      });
+
+      const myRow = user.studentId ? rows.find(r => r.student.id === user.studentId) : null;
+
+      return `
+        <div class="kpi-grid-5">
+          <div class="kpi-card">
+            <div class="kpi-label">새벽 1시까지</div>
+            <div class="kpi-value mono-num text-blue">${counts.oneAm}명</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">새벽 2시까지</div>
+            <div class="kpi-value mono-num" style="color:#4338ca">${counts.twoAm}명</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">미신청 (불참)</div>
+            <div class="kpi-value mono-num">${counts.none}명</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">변경 후 방장 미확인</div>
+            <div class="kpi-value mono-num ${counts.changed > 0 ? 'text-amber' : ''}">${counts.changed}건</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">신청 마감 기준</div>
+            <div class="mono-num" style="font-size:17px;font-weight:700;margin-top:6px">
+              ${cfg.deadlineEnabled ? esc(cfg.extraStudyDeadline) + ' 마감' : '마감 제한 없음'}
+            </div>
+            <div style="font-size:12px;font-weight:600;margin-top:4px" class="${deadlinePassed ? 'text-red' : 'text-green'}">
+              ${deadlinePassed ? '현재 마감됨 (수정 불가)' : '현재 신청 가능'}
+            </div>
+          </div>
+        </div>
+
+        ${isLeader ? `
+          <section class="surface surface-pad" style="margin-bottom:24px">
+            <form id="deadline-form" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px">
+              <div>
+                <h2 style="font-size:14.5px;font-weight:700">추가 면학 신청 마감 시간 설정</h2>
+                <p style="font-size:12px;color:var(--text-muted);margin-top:2px">설정한 시각(예: 24:00 밤 12시) 이후에는 학생이 직접 신청을 변경할 수 없습니다.</p>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+                <label style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;cursor:pointer">
+                  <input type="checkbox" name="deadlineEnabled" ${cfg.deadlineEnabled ? 'checked' : ''} />
+                  마감 제한 사용
+                </label>
+                <input class="input mono-num" name="extraStudyDeadline" value="${esc(cfg.extraStudyDeadline)}" pattern="^(?:[01]\\d|2[0-4]):[0-5]\\d$" style="width:92px;padding:6px 10px" placeholder="24:00" />
+                <button type="submit" class="btn btn-dark btn-sm">마감 시간 저장</button>
+              </div>
+            </form>
+          </section>
+        ` : ''}
+
+        ${myRow ? `
+          <section class="surface surface-pad" style="margin-bottom:24px;${myRow.app.isChanged ? 'background:#fffbeb;border-color:#fcd34d' : ''}">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px">
+              <div>
+                <div style="font-size:12px;color:var(--text-muted)">${esc(myRow.student.room)} · 졸음 누적 ${myRow.drowsyCount}/${cfg.maxDrowsyLimit}회</div>
+                <h2 style="font-size:16px;font-weight:700;margin-top:2px">${esc(myRow.student.name)} 학생 내 추가 면학 신청</h2>
+                <div style="font-size:12.5px;margin-top:6px">
+                  ${myRow.isBlocked
+                    ? `<span class="text-red" style="font-weight:600">졸음 횟수 제한(${cfg.maxDrowsyLimit}회) 도달로 추가 면학 신청이 차단되었습니다.</span>`
+                    : deadlinePassed
+                      ? `<span class="text-red" style="font-weight:600">마감 시간(${esc(cfg.extraStudyDeadline)})이 지나 수정할 수 없습니다.</span>`
+                      : myRow.app.isChanged
+                        ? `<span class="text-amber" style="font-weight:600">신청 변경됨 (${esc(choiceLabel(myRow.app.previousChoice || 'none'))} → ${esc(choiceLabel(myRow.app.choice))}) · 방장 확인 대기 중</span>`
+                        : myRow.app.acknowledgedBy
+                          ? `<span class="text-green" style="font-weight:600">방장 확인 완료 (${esc(myRow.app.acknowledgedBy)} · ${esc(formatKstDateTime(myRow.app.acknowledgedAt))})</span>`
+                          : `<span style="color:var(--text-secondary)">불참, 새벽 1시, 새벽 2시 중 하나를 선택하세요.</span>`
+                  }
+                </div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                ${['none', '1am', '2am'].map(opt => {
+                  const disabled = deadlinePassed || (myRow.isBlocked && opt !== 'none');
+                  const active = myRow.app.choice === opt;
+                  return `<button type="button" class="btn ${active ? 'btn-primary' : 'btn-outline'}" ${disabled ? 'disabled' : ''} data-action="set-extra-choice" data-student-id="${esc(myRow.student.id)}" data-choice="${opt}">${choiceLabel(opt)}</button>`;
+                }).join('')}
+              </div>
+            </div>
+          </section>
+        ` : ''}
+
+        <section class="surface" style="overflow:hidden">
+          <div class="surface-head">
+            <div>
+              <h2 style="font-size:15px;font-weight:700">전체 학생 추가 면학 신청 현황</h2>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:2px">중간에 신청을 바꾸면 행 전체가 노란색으로 강조되며, 방장이 확인 완료를 누르면 색깔이 사라집니다.</p>
+            </div>
+            <div class="seg-group">
+              <button type="button" class="seg-btn ${state.extraFilter === 'all' ? 'active' : ''}" data-action="extra-filter" data-filter="all">전체 (${counts.total})</button>
+              <button type="button" class="seg-btn ${state.extraFilter === 'changed' ? 'active' : ''}" data-action="extra-filter" data-filter="changed">변경 미확인 (${counts.changed})</button>
+              <button type="button" class="seg-btn ${state.extraFilter === '1am' ? 'active' : ''}" data-action="extra-filter" data-filter="1am">1시 (${counts.oneAm})</button>
+              <button type="button" class="seg-btn ${state.extraFilter === '2am' ? 'active' : ''}" data-action="extra-filter" data-filter="2am">2시 (${counts.twoAm})</button>
+              <button type="button" class="seg-btn ${state.extraFilter === 'none' ? 'active' : ''}" data-action="extra-filter" data-filter="none">미신청 (${counts.none})</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>학생 / 호실</th>
+                  <th>졸음 제한 상태</th>
+                  <th>신청 선택</th>
+                  <th>변경 및 방장 확인 상태</th>
+                  ${isLeader ? '<th class="text-right">방장 확인</th>' : ''}
+                </tr>
+              </thead>
+              <tbody>
+                ${filtered.map(({ student, app, drowsyCount, isBlocked }) => `
+                  <tr class="${app.isChanged ? 'row-changed' : ''}">
+                    <td>
+                      <div style="font-weight:600">${esc(student.name)}</div>
+                      <div style="font-size:12px;color:var(--text-muted)">${esc(student.room)} · ${esc(student.grade)}</div>
+                    </td>
+                    <td style="font-size:12px">
+                      ${isBlocked
+                        ? `<span class="text-red" style="font-weight:600">신청 제한 (${drowsyCount}/${cfg.maxDrowsyLimit}회)</span>`
+                        : `<span class="mono-num" style="color:var(--text-secondary)">정상 (${drowsyCount}/${cfg.maxDrowsyLimit}회)</span>`
+                      }
+                    </td>
+                    <td>
+                      ${isLeader ? `
+                        <div class="seg-group">
+                          ${['none', '1am', '2am'].map(opt => `
+                            <button type="button" class="seg-btn ${app.choice === opt ? 'active' : ''}"
+                              ${isBlocked && opt !== 'none' ? 'disabled' : ''}
+                              data-action="set-extra-choice" data-student-id="${esc(student.id)}" data-choice="${opt}">
+                              ${opt === 'none' ? '미신청' : opt === '1am' ? '1시' : '2시'}
+                            </button>
+                          `).join('')}
+                        </div>
+                      ` : `<strong class="${app.choice === 'none' ? '' : 'text-blue'}" style="font-size:12.5px">${choiceLabel(app.choice)}</strong>`}
+                    </td>
+                    <td style="font-size:12px">
+                      ${app.isChanged
+                        ? `<div class="text-amber" style="font-weight:600">변경됨 · 방장 확인 대기 (${choiceLabel(app.previousChoice || 'none')} → ${choiceLabel(app.choice)})</div>
+                           <div class="mono-num" style="font-size:11px;color:#92400e;margin-top:2px">변경 시각: ${esc(formatKstDateTime(app.changedAt))}</div>`
+                        : app.acknowledgedBy
+                          ? `<div class="text-green" style="font-weight:600">방장 확인 완료 · ${esc(app.acknowledgedBy)}</div>
+                             <div class="mono-num" style="font-size:11px;color:var(--text-muted);margin-top:2px">${esc(formatKstDateTime(app.acknowledgedAt))}</div>`
+                          : `<span class="mono-num" style="color:var(--text-muted)">${esc(formatKstDateTime(app.updatedAt))}</span>`
+                      }
+                    </td>
+                    ${isLeader ? `
+                      <td class="text-right">
+                        ${app.isChanged
+                          ? `<button type="button" class="btn btn-amber btn-sm" data-action="ack-extra" data-student-id="${esc(student.id)}">${svgIcon('check', 14)}<span>확인 완료</span></button>`
+                          : `<span style="font-size:12px;color:var(--text-muted)">확인됨</span>`
+                        }
+                      </td>
+                    ` : ''}
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      `;
+    }
+
+    // ==================== TAB 3: NOTICE BOARD ====================
+    function renderNoticesTab(user) {
+      const isLeader = user.role === 'leader';
+      return `
+        ${isLeader ? `
+          <section class="surface surface-pad" style="margin-bottom:24px">
+            <div style="padding-bottom:14px;border-bottom:1px solid #f1f5f9">
+              <h2 style="font-size:15px;font-weight:700">기숙사 일정 및 공지 작성</h2>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:2px">
+                현재 로그인한 <strong>${esc(user.name)} (${esc(user.title)})</strong> 명의로 등록됩니다. 사진과 동영상을 함께 올릴 수 있습니다.
+              </p>
+            </div>
+            <form id="notice-form" style="margin-top:14px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px">
+                <div>
+                  <label class="label">공지 제목</label>
+                  <input class="input" name="title" required placeholder="예: 11월 기숙사 대청소 및 환기 일정" />
+                </div>
+                <div>
+                  <label class="label">관련 일정 날짜 (선택)</label>
+                  <input class="input mono-num" type="date" name="scheduleDate" />
+                </div>
+              </div>
+              <div>
+                <label class="label">공지 내용</label>
+                <textarea class="textarea" name="content" rows="4" required placeholder="학생들에게 안내할 일정 및 공지 내용을 입력하세요."></textarea>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px">
+                <input type="file" name="files" id="notice-files" multiple accept="image/*,video/*" style="font-size:12.5px" />
+                <button type="submit" class="btn btn-primary">${svgIcon('send', 14)}<span>${esc(user.name)} 명의로 공지 올리기</span></button>
+              </div>
+            </form>
+          </section>
+        ` : ''}
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h2 style="font-size:15px;font-weight:700">기숙사 공지 · 앞으로의 일정 (${state.store.notices.length}건)</h2>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px">
+          ${state.store.notices.length === 0 ? '<div class="surface surface-pad" style="text-align:center;color:var(--text-muted);font-size:13px">등록된 공지가 없습니다.</div>' : state.store.notices.map(n => `
+            <article class="surface surface-pad">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+                <div>
+                  <div style="font-size:12px;color:var(--text-muted);display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+                    <strong class="text-blue">작성자: ${esc(n.authorName)} (${esc(n.authorTitle)})</strong>
+                    <span>·</span>
+                    <span class="mono-num">${esc(formatKstDateTime(n.createdAt))}</span>
+                    ${n.scheduleDate ? `<span>·</span><strong class="mono-num" style="color:var(--text-primary)">예정 일정: ${esc(n.scheduleDate)}</strong>` : ''}
+                  </div>
+                  <h3 style="font-size:17px;font-weight:700;margin-top:6px">${esc(n.title)}</h3>
+                </div>
+                ${isLeader ? `<button type="button" class="btn btn-danger-ghost" data-action="delete-notice" data-notice-id="${esc(n.id)}">${svgIcon('trash', 15)}</button>` : ''}
+              </div>
+              <p style="margin-top:12px;font-size:14px;color:var(--text-secondary);white-space:pre-line;line-height:1.6">${esc(n.content)}</p>
+              ${(n.attachments && n.attachments.length > 0) ? `
+                <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+                  ${n.attachments.map(att => {
+                    const url = mediaUrlCache.get(att.id) || att.fallbackUrl || '';
+                    if (!url) return '';
+                    return att.kind === 'video'
+                      ? `<div style="border:1px solid var(--border-hairline);border-radius:8px;overflow:hidden;background:#020617"><video src="${esc(url)}" controls playsinline style="width:100%;max-height:220px"></video><div style="padding:6px 10px;font-size:11px;color:#cbd5e1">${esc(att.originalName)}</div></div>`
+                      : `<button type="button" data-action="open-lightbox" data-url="${esc(url)}" style="border:1px solid var(--border-hairline);border-radius:8px;overflow:hidden;background:#fff;padding:0;cursor:pointer;text-align:left"><img src="${esc(url)}" alt="${esc(att.originalName)}" style="width:100%;height:190px;object-fit:cover;display:block" /><div style="padding:6px 10px;font-size:11px;color:var(--text-secondary)">${esc(att.originalName)}</div></button>`;
+                  }).join('')}
+                </div>
+              ` : ''}
+            </article>
+          `).join('')}
+        </div>
+
+        ${state.lightboxUrl ? `
+          <div class="modal-backdrop" data-action="close-lightbox">
+            <img src="${esc(state.lightboxUrl)}" alt="확대 이미지" style="max-width:92vw;max-height:86vh;border-radius:10px" />
+          </div>
+        ` : ''}
+      `;
+    }
+
+    // ==================== TAB 4: ATTENDANCE CAMERA & GPS ====================
+    function renderAttendanceTab(user) {
+      const isLeader = user.role === 'leader';
+      const nowStr = formatKstDateTime(new Date().toISOString());
+
+      return `
+        <section class="surface surface-pad" style="margin-bottom:24px">
+          <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid #f1f5f9">
+            <div>
+              <h2 style="font-size:15px;font-weight:700">공휴일 학원 현장 출석 인증 (시각·위치 조작 방지)</h2>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:2px">
+                저장된 사진 파일 업로드는 허용되지 않습니다. 실시간 카메라 촬영 시 현재 시각과 GPS 위치가 화면과 사진에 함께 고정 기록됩니다.
+              </p>
+            </div>
+            ${isLeader ? `
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:12px;color:var(--text-muted)">대상 학생:</span>
+                <select class="select" id="attendance-student-select" style="width:160px;padding:6px 10px;font-size:12px">
+                  ${state.store.students.map(s => `<option value="${esc(s.id)}">${esc(s.name)} (${esc(s.room)})</option>`).join('')}
+                </select>
+              </div>
+            ` : ''}
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0">
+            <div style="padding:14px;background:#f8fafc;border:1px solid var(--border-hairline);border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-size:11.5px;font-weight:600;color:var(--text-muted)">현재 표준 시각 (수정 불가)</div>
+                <div id="live-att-clock" class="mono-num" style="font-size:15px;font-weight:700;margin-top:4px">${esc(nowStr)}</div>
+              </div>
+              ${svgIcon('clock', 20)}
+            </div>
+            <div style="padding:14px;background:#f8fafc;border:1px solid var(--border-hairline);border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:10px">
+              <div style="min-width:0">
+                <div style="font-size:11.5px;font-weight:600;color:var(--text-muted)">실시간 GPS 위치 (자동 수신)</div>
+                <div style="font-size:13.5px;font-weight:700;margin-top:4px">${state.geo.status === 'loading' ? '위치 수신 중...' : esc(state.geo.label)}</div>
+                ${state.geo.lat !== null ? `<div class="mono-num" style="font-size:11px;color:var(--text-muted);margin-top:2px">위도 ${state.geo.lat} · 경도 ${state.geo.lng} · 오차 ±${state.geo.acc}m</div>` : ''}
+                ${state.geo.err ? `<div style="font-size:11px;color:var(--status-red);margin-top:2px">${esc(state.geo.err)}</div>` : ''}
+              </div>
+              <button type="button" class="btn btn-outline btn-sm" data-action="refresh-geo">위치 갱신</button>
+            </div>
+          </div>
+
+          ${!state.cameraActive ? `
+            <div style="border:1px dashed var(--border-strong);border-radius:10px;background:#f8fafc;padding:36px 20px;text-align:center">
+              <div style="color:var(--text-muted);margin-bottom:10px">${svgIcon('camera', 34)}</div>
+              <div style="font-size:14px;font-weight:600">실시간 카메라를 켜고 학원 현장을 촬영하세요</div>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:4px">촬영 순간의 시각과 GPS 위치가 사진 하단에 영구 각인됩니다.</p>
+              <button type="button" class="btn btn-primary" style="margin-top:14px" data-action="start-camera">
+                ${svgIcon('camera', 15)}<span>카메라 및 위치 인증 시작</span>
+              </button>
+              ${state.cameraError ? `<div style="margin-top:12px;font-size:12px;color:var(--status-red);font-weight:500">${esc(state.cameraError)}</div>` : ''}
+            </div>
+          ` : `
+            <div>
+              <div style="position:relative;border-radius:10px;overflow:hidden;background:#020617;border:1px solid #1e293b">
+                <video id="att-video" autoplay playsinline muted style="width:100%;max-height:400px;object-fit:contain;display:block;margin:0 auto"></video>
+                <div style="position:absolute;bottom:0;left:0;right:0;padding:14px 18px;background:linear-gradient(to top,rgba(2,6,23,0.9),transparent);color:#fff;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-size:12px">
+                  <span id="live-cam-clock" class="mono-num" style="font-weight:700">촬영 시각: ${esc(nowStr)}</span>
+                  <span>위치: ${esc(state.geo.label)}</span>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px">
+                <button type="button" class="btn btn-outline" data-action="stop-camera">카메라 닫기</button>
+                <button type="button" class="btn btn-primary" data-action="capture-attendance">${svgIcon('checkCircle', 15)}<span>사진 촬영 및 시각·위치 인증 제출</span></button>
+              </div>
+            </div>
+          `}
+        </section>
+
+        <h2 style="font-size:15px;font-weight:700;margin-bottom:14px">인증 완료된 학원 출석 기록 (${state.store.attendanceCheckins.length}건)</h2>
+        ${state.store.attendanceCheckins.length === 0 ? '<div class="surface surface-pad" style="text-align:center;color:var(--text-muted);font-size:13px">아직 제출된 출석 인증 사진이 없습니다.</div>' : `
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">
+            ${state.store.attendanceCheckins.map(item => {
+              const url = mediaUrlCache.get(item.mediaId) || item.fallbackUrl || '';
+              return `
+                <article class="surface" style="overflow:hidden">
+                  ${url ? `<img src="${esc(url)}" alt="출석 인증" style="width:100%;height:220px;object-fit:cover;display:block;background:#020617" />` : ''}
+                  <div style="padding:16px;font-size:12.5px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                      <strong style="font-size:14px">${esc(item.studentName)} (${esc(item.room)})</strong>
+                      <span class="text-green" style="font-weight:600;display:inline-flex;align-items:center;gap:4px">${svgIcon('checkCircle', 14)} 인증 완료</span>
+                    </div>
+                    <div style="border-top:1px solid #f1f5f9;padding-top:10px;display:flex;flex-direction:column;gap:6px">
+                      <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">인증 시각</span><strong class="mono-num">${esc(formatKstDateTime(item.capturedAt))}</strong></div>
+                      <div style="display:flex;justify-content:space-between;gap:8px"><span style="color:var(--text-muted)">인증 위치</span><strong style="text-align:right">${esc(item.locationLabel)}</strong></div>
+                      ${item.latitude !== null ? `
+                        <div style="display:flex;justify-content:space-between">
+                          <span style="color:var(--text-muted)">GPS 좌표</span>
+                          <a class="mono-num text-blue" href="https://maps.google.com/?q=${item.latitude},${item.longitude}" target="_blank" rel="noreferrer">${item.latitude}, ${item.longitude} (±${item.accuracy}m)</a>
+                        </div>
+                      ` : ''}
+                      <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">무결성 코드</span><span class="mono-num" style="color:var(--text-secondary)">${esc(item.verificationCode)}</span></div>
+                    </div>
+                  </div>
+                </article>
+              `;
+            }).join('')}
+          </div>
+        `}
+      `;
+    }
+
+    // ==================== TAB 5: WHISPER CHAT ====================
+    function markActiveWhisperRead(user, threadKey) {
+      if (!threadKey) return;
+      const now = new Date().toISOString();
+      let changed = false;
+      state.store.whisperMessages.forEach(m => {
+        if (m.threadKey === threadKey && m.senderUserId !== user.id && !m.readByRecipient) {
+          m.readByRecipient = true;
+          m.readAt = now;
+          changed = true;
+        }
+      });
+      if (changed) saveStore();
+    }
+
+    function renderWhisperTab(user) {
+      const isLeader = user.role === 'leader';
+      const partners = isLeader
+        ? state.store.users.filter(u => u.role === 'student').map(u => ({ id: u.id, name: u.name, sub: u.room }))
+        : state.store.users.filter(u => u.role === 'leader').map(u => ({ id: u.id, name: u.name, sub: u.title }));
+
+      if (!state.whisperPartnerId && partners.length > 0) {
+        state.whisperPartnerId = partners[0].id;
+      }
+
+      const activePartner = partners.find(p => p.id === state.whisperPartnerId) || null;
+      const activeThreadKey = activePartner
+        ? (isLeader ? `${activePartner.id}__${user.id}` : `${user.id}__${activePartner.id}`)
+        : '';
+
+      if (activeThreadKey) {
+        markActiveWhisperRead(user, activeThreadKey);
+      }
+
+      const threadMsgs = activeThreadKey
+        ? state.store.whisperMessages.filter(m => m.threadKey === activeThreadKey)
+        : [];
+
+      const unreadFrom = {};
+      state.store.whisperMessages.forEach(m => {
+        if (m.senderUserId !== user.id && !m.readByRecipient && m.threadKey.includes(user.id)) {
+          unreadFrom[m.senderUserId] = (unreadFrom[m.senderUserId] || 0) + 1;
+        }
+      });
+
+      return `
+        <div class="whisper-shell">
+          <aside class="whisper-threads">
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border-hairline)">
+              <h2 style="font-size:14px;font-weight:700">${isLeader ? '학생 1:1 귓속말 함' : '방장 1:1 귓속말 선택'}</h2>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:2px">
+                ${isLeader ? '학생을 선택해 답변하면 읽음 상태가 즉시 반영됩니다.' : '문의할 방장을 선택해 비공개로 질문하세요.'}
+              </p>
+            </div>
+            <div style="overflow-y:auto;flex:1">
+              ${partners.length === 0 ? `
+                <div style="padding:28px 16px;text-align:center;font-size:12px;color:var(--text-muted)">
+                  ${isLeader ? '가입한 학생 계정이 아직 없습니다.' : '등록된 방장 계정이 없습니다.'}
+                </div>
+              ` : partners.map(p => {
+                const tk = isLeader ? `${p.id}__${user.id}` : `${user.id}__${p.id}`;
+                const last = state.store.whisperMessages.filter(m => m.threadKey === tk).slice(-1)[0];
+                const unread = unreadFrom[p.id] || 0;
+                return `
+                  <button type="button" class="whisper-thread-item ${activePartner && activePartner.id === p.id ? 'active' : ''}" data-action="select-whisper" data-partner-id="${esc(p.id)}">
+                    <div style="min-width:0">
+                      <div style="font-size:13.5px;font-weight:600">${esc(p.name)} <span style="font-weight:400;color:var(--text-muted);font-size:12px">· ${esc(p.sub)}</span></div>
+                      <div style="font-size:12px;color:var(--text-muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${last ? esc(last.text) : '대화 내용이 없습니다.'}</div>
+                    </div>
+                    ${unread > 0 ? `<span class="mono-num" style="padding:2px 7px;border-radius:999px;background:#dc2626;color:#fff;font-size:11px;font-weight:700">${unread}</span>` : ''}
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </aside>
+
+          <section class="whisper-pane">
+            ${activePartner ? `
+              <div style="padding:14px 20px;background:#fff;border-bottom:1px solid var(--border-hairline)">
+                <div style="font-size:14px;font-weight:700">${esc(activePartner.name)} (${esc(activePartner.sub)})</div>
+                <div style="font-size:12px;color:var(--text-muted)">비공개 1:1 귓속말 · 상대방이 열람하면 숫자 1이 사라지고 읽음이 표시됩니다</div>
+              </div>
+              <div class="whisper-messages" id="whisper-scroll">
+                ${threadMsgs.length === 0 ? '<div style="margin:auto;font-size:12.5px;color:var(--text-muted)">첫 번째 귓속말을 보내보세요.</div>' : threadMsgs.map(m => {
+                  const mine = m.senderUserId === user.id;
+                  return `
+                    <div class="msg-row ${mine ? 'mine' : 'theirs'}">
+                      ${!mine ? `<div style="font-size:11px;color:var(--text-muted);margin-bottom:3px;padding:0 4px">${esc(m.senderName)}</div>` : ''}
+                      <div class="msg-bubble-wrap">
+                        <div class="msg-bubble">${esc(m.text)}</div>
+                        <div class="msg-meta">
+                          ${mine ? `<span class="${m.readByRecipient ? 'text-green' : 'text-amber'}" style="font-weight:700">${m.readByRecipient ? '읽음' : '1'}</span>` : ''}
+                          <span style="color:#94a3b8">${esc(formatKstTime(m.createdAt))}</span>
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+              <form id="whisper-form" style="padding:14px 16px;background:#fff;border-top:1px solid var(--border-hairline);display:flex;gap:10px">
+                <input class="input" name="text" required placeholder="${esc(activePartner.name)}님에게 귓속말 입력..." />
+                <button type="submit" class="btn btn-primary">${svgIcon('send', 14)}<span>전송</span></button>
+              </form>
+            ` : '<div style="margin:auto;font-size:13px;color:var(--text-muted);padding:32px">좌측 목록에서 대화 상대를 선택하세요.</div>'}
+          </section>
+        </div>
+      `;
+    }
+
+    // ==================== TAB 6: CO2 RESEARCH LAB (RESTRICTED) ====================
+    function renderResearchCharts(logs, customMetrics) {
+      if (logs.length === 0) {
+        return '<div style="height:240px;border:1px dashed var(--border-strong);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12.5px;color:var(--text-muted)">측정 데이터를 기록하면 그래프가 표시됩니다.</div>';
+      }
+
+      const xOpts = [{ key: 'co2Ppm', label: '이산화탄소 농도 (ppm)' }].concat(
+        customMetrics.filter(m => m.type === 'number').map(m => ({ key: m.id, label: m.unit ? `${m.name} (${m.unit})` : m.name }))
+      );
+      const xLabel = (xOpts.find(o => o.key === state.xAxisKey) || xOpts[0]).label;
+      const yLabel = state.yAxisKey === 'drowsyRate' ? '졸음 비율 (%)' : '졸음 인원 (명)';
+
+      const getX = l => state.xAxisKey === 'co2Ppm' ? l.co2Ppm : (typeof l.customValues[state.xAxisKey] === 'number' ? l.customValues[state.xAxisKey] : null);
+      const getY = l => state.yAxisKey === 'drowsyRate' ? l.drowsyRate : l.drowsyStudents;
+
+      if (state.graphType === 'bar') {
+        const ventGroups = [
+          { key: 'open', label: '출입문 개방', color: '#16a34a' },
+          { key: 'partial', label: '부분 개방', color: '#d97706' },
+          { key: 'closed', label: '출입문 닫힘', color: '#dc2626' }
+        ].map(g => {
+          const items = logs.filter(l => l.doorVentilation === g.key);
+          const avgRate = items.length ? (items.reduce((s, i) => s + i.drowsyRate, 0) / items.length).toFixed(1) : '0.0';
+          const avgCo2 = items.length ? Math.round(items.reduce((s, i) => s + i.co2Ppm, 0) / items.length) : 0;
+          return { ...g, count: items.length, avgRate: Number(avgRate), avgCo2 };
+        });
+
+        const bins = [
+          { label: '1,000 ppm 미만 (양호)', items: logs.filter(l => l.co2Ppm < 1000), color: '#16a34a' },
+          { label: '1,000~1,499 ppm (보통)', items: logs.filter(l => l.co2Ppm >= 1000 && l.co2Ppm < 1500), color: '#d97706' },
+          { label: '1,500 ppm 이상 (환기 필요)', items: logs.filter(l => l.co2Ppm >= 1500), color: '#dc2626' }
+        ].map(b => ({
+          ...b,
+          count: b.items.length,
+          avgRate: b.items.length ? Number((b.items.reduce((s, i) => s + i.drowsyRate, 0) / b.items.length).toFixed(1)) : 0
+        }));
+
+        return `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+            <div style="border:1px solid var(--border-hairline);border-radius:8px;padding:18px">
+              <h3 style="font-size:14px;font-weight:700;margin-bottom:14px">출입문 환기 상태별 평균 졸음 비율</h3>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                ${ventGroups.map(g => `
+                  <div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                      <strong>${g.label} (${g.count}회 · 평균 ${g.avgCo2} ppm)</strong>
+                      <strong class="mono-num">${g.avgRate}%</strong>
+                    </div>
+                    <div style="height:10px;background:#f1f5f9;border-radius:999px;overflow:hidden">
+                      <div style="height:100%;width:${Math.min(100, g.avgRate * 2)}%;background:${g.color}"></div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            <div style="border:1px solid var(--border-hairline);border-radius:8px;padding:18px">
+              <h3 style="font-size:14px;font-weight:700;margin-bottom:14px">CO₂ 농도 구간별 평균 졸음 비율</h3>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                ${bins.map(b => `
+                  <div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                      <strong>${b.label} (${b.count}회)</strong>
+                      <strong class="mono-num">${b.avgRate}%</strong>
+                    </div>
+                    <div style="height:10px;background:#f1f5f9;border-radius:999px;overflow:hidden">
+                      <div style="height:100%;width:${Math.min(100, b.avgRate * 2)}%;background:${b.color}"></div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      const pairs = logs.map(l => ({ l, x: getX(l), y: getY(l) })).filter(p => p.x !== null);
+      if (pairs.length === 0) {
+        return '<div style="height:240px;border:1px dashed var(--border-strong);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12.5px;color:var(--text-muted)">선택한 변수에 해당하는 수치 기록이 없습니다.</div>';
+      }
+
+      if (state.graphType === 'timeseries') {
+        const w = 760, h = 290, pL = 52, pR = 52, pT = 22, pB = 40;
+        const pW = w - pL - pR, pH = h - pT - pB;
+        const xs = pairs.map(p => p.x), ys = pairs.map(p => p.y);
+        const minX = Math.min(...xs) * 0.9, maxX = Math.max(...xs) * 1.1 || 10;
+        const maxY = Math.max(10, Math.ceil(Math.max(...ys) * 1.15));
+        const px = i => pairs.length === 1 ? pL + pW / 2 : pL + (i / (pairs.length - 1)) * pW;
+        const pyL = v => pT + ((maxX - v) / Math.max(1, maxX - minX)) * pH;
+        const pyR = v => pT + ((maxY - v) / Math.max(1, maxY)) * pH;
+        const pathL = pairs.map((p, i) => `${i === 0 ? 'M' : 'L'} ${px(i).toFixed(1)} ${pyL(p.x).toFixed(1)}`).join(' ');
+        const pathR = pairs.map((p, i) => `${i === 0 ? 'M' : 'L'} ${px(i).toFixed(1)} ${pyR(p.y).toFixed(1)}`).join(' ');
+        const hov = pairs.find(p => p.l.id === state.hoveredResearchId);
+
+        return `
+          <div style="display:flex;gap:18px;font-size:12px;margin-bottom:10px">
+            <span class="text-blue" style="font-weight:600">― 좌측 축: ${esc(xLabel)}</span>
+            <span class="text-red" style="font-weight:600">― 우측 축: ${esc(yLabel)}</span>
+          </div>
+          <div style="border:1px solid var(--border-hairline);border-radius:8px;background:#f8fafc;padding:10px">
+            <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:280px;overflow:visible">
+              ${[0, 0.5, 1].map(r => {
+                const y = pT + (1 - r) * pH;
+                return `
+                  <line x1="${pL}" y1="${y}" x2="${w - pR}" y2="${y}" stroke="#e2e8f0" stroke-width="1" />
+                  <text x="${pL - 6}" y="${y + 4}" text-anchor="end" fill="#1d4ed8" font-size="10" font-family="monospace">${(minX + (maxX - minX) * r).toFixed(0)}</text>
+                  <text x="${w - pR + 6}" y="${y + 4}" text-anchor="start" fill="#dc2626" font-size="10" font-family="monospace">${(maxY * r).toFixed(0)}</text>
+                `;
+              }).join('')}
+              ${pairs.length > 1 ? `<path d="${pathL}" fill="none" stroke="#1d4ed8" stroke-width="2.2" /><path d="${pathR}" fill="none" stroke="#dc2626" stroke-width="2.2" />` : ''}
+              ${pairs.map((p, i) => `
+                <circle cx="${px(i)}" cy="${pyL(p.x)}" r="5" fill="#1d4ed8" stroke="#fff" stroke-width="1.5" style="cursor:pointer" data-hover-research="${esc(p.l.id)}" />
+                <circle cx="${px(i)}" cy="${pyR(p.y)}" r="5" fill="#dc2626" stroke="#fff" stroke-width="1.5" style="cursor:pointer" data-hover-research="${esc(p.l.id)}" />
+                <text x="${px(i)}" y="${h - 12}" text-anchor="middle" fill="#64748b" font-size="10" font-family="monospace">#${i + 1}</text>
+              `).join('')}
+            </svg>
+          </div>
+          ${hov ? `<div style="margin-top:8px;padding:8px 12px;background:#0f172a;color:#fff;border-radius:8px;font-size:12px;display:flex;justify-content:space-between"><strong>${esc(hov.l.sessionLabel)}</strong><span class="mono-num">${esc(xLabel)}: ${hov.x} · ${esc(yLabel)}: ${hov.y}</span></div>` : ''}
+        `;
+      }
+
+      // Scatter + linear regression
+      const n = pairs.length;
+      const meanX = pairs.reduce((s, p) => s + p.x, 0) / n;
+      const meanY = pairs.reduce((s, p) => s + p.y, 0) / n;
+      let num = 0, dX = 0, dY = 0;
+      pairs.forEach(p => { const dx = p.x - meanX, dy = p.y - meanY; num += dx * dy; dX += dx * dx; dY += dy * dy; });
+      const den = Math.sqrt(dX * dY);
+      const r = n >= 2 && den > 0 ? (num / den).toFixed(3) : null;
+      const r2 = r !== null ? (Number(r) * Number(r)).toFixed(3) : null;
+      const slope = dX > 0 ? num / dX : 0;
+      const intercept = meanY - slope * meanX;
+
+      const w = 760, h = 300, pL = 56, pR = 24, pT = 22, pB = 44;
+      const pW = w - pL - pR, pH = h - pT - pB;
+      const xs = pairs.map(p => p.x), ys = pairs.map(p => p.y);
+      const rawMinX = Math.min(...xs), rawMaxX = Math.max(...xs);
+      const marginX = Math.max(1, (rawMaxX - rawMinX) * 0.1);
+      const minX = Math.max(0, rawMinX - marginX), maxX = rawMaxX + marginX;
+      const minY = 0, maxY = Math.max(10, Math.ceil(Math.max(...ys) * 1.15));
+      const mx = v => pL + ((v - minX) / Math.max(1, maxX - minX)) * pW;
+      const my = v => pT + ((maxY - v) / Math.max(1, maxY - minY)) * pH;
+      const regY1 = Math.max(minY, Math.min(maxY, slope * minX + intercept));
+      const regY2 = Math.max(minY, Math.min(maxY, slope * maxX + intercept));
+      const hov = pairs.find(p => p.l.id === state.hoveredResearchId);
+
+      return `
+        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;font-size:12px;margin-bottom:10px">
+          <div style="display:flex;gap:14px">
+            <span>● <span class="text-green">출입문 개방</span></span>
+            <span>● <span class="text-amber">부분 개방</span></span>
+            <span>● <span class="text-red">출입문 닫힘</span></span>
+          </div>
+          ${r !== null ? `<div class="mono-num">선형 회귀 추세선 · r = <strong class="text-blue">${r}</strong> · R² = <strong>${r2}</strong></div>` : ''}
+        </div>
+        <div style="border:1px solid var(--border-hairline);border-radius:8px;background:#f8fafc;padding:10px">
+          <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:285px;overflow:visible">
+            ${[0, 0.25, 0.5, 0.75, 1].map(ratio => {
+              const val = minY + (maxY - minY) * ratio;
+              const y = my(val);
+              return `<line x1="${pL}" y1="${y}" x2="${w - pR}" y2="${y}" stroke="#e2e8f0" /><text x="${pL - 8}" y="${y + 4}" text-anchor="end" fill="#64748b" font-size="10" font-family="monospace">${val.toFixed(0)}</text>`;
+            }).join('')}
+            ${[0, 0.25, 0.5, 0.75, 1].map(ratio => {
+              const val = minX + (maxX - minX) * ratio;
+              return `<text x="${mx(val)}" y="${h - 18}" text-anchor="middle" fill="#64748b" font-size="10" font-family="monospace">${val.toFixed(0)}</text>`;
+            }).join('')}
+            <text x="${pL + pW / 2}" y="${h - 2}" text-anchor="middle" fill="#334155" font-size="11" font-weight="600">${esc(xLabel)}</text>
+            <text x="14" y="${pT + pH / 2}" text-anchor="middle" transform="rotate(-90 14 ${pT + pH / 2})" fill="#334155" font-size="11" font-weight="600">${esc(yLabel)}</text>
+            ${pairs.length >= 2 ? `<line x1="${mx(minX)}" y1="${my(regY1)}" x2="${mx(maxX)}" y2="${my(regY2)}" stroke="#1d4ed8" stroke-width="2" stroke-dasharray="6 4" />` : ''}
+            ${pairs.map(p => {
+              const c = p.l.doorVentilation === 'open' ? '#16a34a' : p.l.doorVentilation === 'partial' ? '#d97706' : '#dc2626';
+              const active = state.hoveredResearchId === p.l.id;
+              return `<circle cx="${mx(p.x)}" cy="${my(p.y)}" r="${active ? 8 : 6}" fill="${c}" stroke="#fff" stroke-width="2" style="cursor:pointer" data-hover-research="${esc(p.l.id)}" />`;
+            }).join('')}
+          </svg>
+        </div>
+        ${hov ? `<div style="margin-top:8px;padding:8px 12px;background:#0f172a;color:#fff;border-radius:8px;font-size:12px;display:flex;justify-content:space-between"><span><strong>${esc(hov.l.sessionLabel)}</strong> · ${esc(formatKstDateTime(hov.l.recordedAt))}</span><span class="mono-num">${esc(xLabel)}: ${hov.x} · ${esc(yLabel)}: ${hov.y} (${hov.l.drowsyStudents}/${hov.l.totalStudents}명)</span></div>` : ''}
+      `;
+    }
+
+    function renderResearchTab(user) {
+      if (!user.isResearcher) {
+        return `
+          <div class="surface surface-pad" style="max-width:520px;margin:40px auto;text-align:center">
+            <div style="color:var(--text-muted);margin-bottom:10px">${svgIcon('lock', 36)}</div>
+            <h2 style="font-size:18px;font-weight:700">지정된 연구 담당자 전용 구역</h2>
+            <p style="font-size:13.5px;color:var(--text-secondary);margin-top:8px;line-height:1.6">
+              이산화탄소 농도와 졸음 상관관계 프로젝트 데이터는 지정된 연구 권한이 부여된 사용자만 열람·조작할 수 있습니다.
+            </p>
+          </div>
+        `;
+      }
+
+      const logs = state.store.researchLogs;
+      const metrics = state.store.customMetrics;
+      const avgCo2 = logs.length ? Math.round(logs.reduce((s, l) => s + l.co2Ppm, 0) / logs.length) : 0;
+
+      // Pearson r for CO2 vs drowsyRate
+      let pearsonText = '-';
+      let r2Text = '2건 이상 측정 시 계산';
+      if (logs.length >= 2) {
+        const mx = logs.reduce((s, l) => s + l.co2Ppm, 0) / logs.length;
+        const my = logs.reduce((s, l) => s + l.drowsyRate, 0) / logs.length;
+        let num = 0, dx = 0, dy = 0;
+        logs.forEach(l => { num += (l.co2Ppm - mx) * (l.drowsyRate - my); dx += (l.co2Ppm - mx) ** 2; dy += (l.drowsyRate - my) ** 2; });
+        const den = Math.sqrt(dx * dy);
+        if (den > 0) {
+          const r = num / den;
+          pearsonText = r.toFixed(3);
+          r2Text = `결정계수 R² = ${(r * r).toFixed(3)}`;
+        }
+      }
+
+      const xOpts = [{ key: 'co2Ppm', label: '이산화탄소 농도 (ppm)' }].concat(
+        metrics.filter(m => m.type === 'number').map(m => ({ key: m.id, label: m.unit ? `${m.name} (${m.unit})` : m.name }))
+      );
+
+      return `
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">누적 측정 회차</div>
+            <div class="kpi-value mono-num">${logs.length}회</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">평균 CO₂ 농도</div>
+            <div class="kpi-value mono-num">${logs.length ? avgCo2 + ' ppm' : '-'}</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">CO₂-졸음 상관계수 (r)</div>
+            <div class="kpi-value mono-num text-blue">${pearsonText}</div>
+            <div class="kpi-sub">${r2Text}</div>
+          </div>
+          <div class="kpi-card" style="display:flex;flex-direction:column;justify-content:space-between">
+            <div>
+              <div class="kpi-label">연구 데이터 내보내기</div>
+              <div class="kpi-sub">보고서 분석용 CSV</div>
+            </div>
+            <button type="button" class="btn btn-dark btn-sm" style="margin-top:8px" data-action="export-research-csv">${svgIcon('download', 14)}<span>CSV 다운로드</span></button>
+          </div>
+        </div>
+
+        <div class="split-12" style="margin-bottom:24px">
+          <section class="surface surface-pad col-span-8">
+            <div style="padding-bottom:14px;border-bottom:1px solid #f1f5f9">
+              <h2 style="font-size:15px;font-weight:700">면학실 환경 · CO₂ 및 졸음 인원 측정 기록</h2>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:2px">이산화탄소 농도, 총 인원 중 졸고 있는 인원, 출입문 환기 상태 및 추가 항목을 기록합니다.</p>
+            </div>
+            <form id="research-log-form" style="margin-top:14px;display:flex;flex-direction:column;gap:14px">
+              <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+                <div>
+                  <label class="label">측정 회차 / 상황</label>
+                  <input class="input" name="sessionLabel" required placeholder="예: 2교시 후반" />
+                </div>
+                <div>
+                  <label class="label">CO₂ 농도 (ppm)</label>
+                  <input class="input mono-num" type="number" name="co2Ppm" required min="200" max="10000" value="1150" />
+                </div>
+                <div>
+                  <label class="label">출입문 환기 상태</label>
+                  <select class="select" name="doorVentilation">
+                    <option value="open">개방 (환기 중)</option>
+                    <option value="partial">부분 개방</option>
+                    <option value="closed" selected>닫힘 (밀폐)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="label">총 인원 (명)</label>
+                  <input class="input mono-num" type="number" name="totalStudents" required min="1" max="500" value="30" />
+                </div>
+                <div>
+                  <label class="label">졸고 있는 인원 (명)</label>
+                  <input class="input mono-num" type="number" name="drowsyStudents" required min="0" max="500" value="4" />
+                </div>
+                ${metrics.map(m => `
+                  <div>
+                    <label class="label">${esc(m.name)} ${m.unit ? '(' + esc(m.unit) + ')' : ''}</label>
+                    ${m.type === 'boolean'
+                      ? `<select class="select" name="custom_${esc(m.id)}"><option value="false">아니오</option><option value="true">예</option></select>`
+                      : `<input class="input mono-num" type="number" step="any" name="custom_${esc(m.id)}" placeholder="수치 입력" />`
+                    }
+                  </div>
+                `).join('')}
+              </div>
+              <div style="display:flex;gap:10px;align-items:end">
+                <div style="flex:1">
+                  <label class="label">관찰 메모 (선택)</label>
+                  <input class="input" name="note" placeholder="창문 개폐, 냉난방 가동 여부 등" />
+                </div>
+                <button type="submit" class="btn btn-primary">측정 수치 기록하기</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="surface surface-pad col-span-4">
+            <h2 style="font-size:15px;font-weight:700">측정 항목(변수) 즉시 추가</h2>
+            <p style="font-size:12px;color:var(--text-muted);margin-top:3px">새로운 환경 수치를 바로 추가해 그래프에 비교할 수 있습니다.</p>
+            <form id="metric-add-form" style="margin-top:14px;display:flex;flex-direction:column;gap:10px">
+              <div>
+                <label class="label">새 항목 이름</label>
+                <input class="input" name="name" required placeholder="예: 실내 소음, 조도, 선풍기" />
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div>
+                  <label class="label">단위</label>
+                  <input class="input" name="unit" placeholder="예: dB, lux" />
+                </div>
+                <div>
+                  <label class="label">유형</label>
+                  <select class="select" name="type">
+                    <option value="number">숫자 수치</option>
+                    <option value="boolean">예 / 아니오</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-dark" style="width:100%">${svgIcon('plus', 14)}<span>측정 항목 추가</span></button>
+            </form>
+            <div style="margin-top:16px;padding-top:12px;border-top:1px solid #f1f5f9">
+              <div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">등록된 사용자 정의 항목</div>
+              <div style="border:1px solid var(--border-hairline);border-radius:8px">
+                ${metrics.length === 0 ? '<div style="padding:12px;font-size:12px;color:var(--text-muted)">없음</div>' : metrics.map(m => `
+                  <div style="padding:8px 10px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;font-size:12px">
+                    <span><strong>${esc(m.name)}</strong> ${m.unit ? '(' + esc(m.unit) + ')' : ''}</span>
+                    <button type="button" class="btn btn-danger-ghost" data-action="delete-metric" data-metric-id="${esc(m.id)}">${svgIcon('trash', 13)}</button>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <section class="surface surface-pad" style="margin-bottom:24px">
+          <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid #f1f5f9;margin-bottom:16px">
+            <div>
+              <h2 style="font-size:15px;font-weight:700">상관관계 및 추이 시각화 그래프</h2>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:2px">원하는 그래프 종류와 X/Y 비교 변수를 선택하세요.</p>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+              <div class="seg-group">
+                <button type="button" class="seg-btn ${state.graphType === 'scatter' ? 'active' : ''}" data-action="set-graph" data-graph="scatter">산점도 · 상관관계</button>
+                <button type="button" class="seg-btn ${state.graphType === 'timeseries' ? 'active' : ''}" data-action="set-graph" data-graph="timeseries">시간대별 추이</button>
+                <button type="button" class="seg-btn ${state.graphType === 'bar' ? 'active' : ''}" data-action="set-graph" data-graph="bar">환기·구간 비교</button>
+              </div>
+              ${state.graphType !== 'bar' ? `
+                <select class="select" id="research-x-select" style="width:auto;padding:6px 10px;font-size:12px">
+                  ${xOpts.map(o => `<option value="${esc(o.key)}" ${state.xAxisKey === o.key ? 'selected' : ''}>비교 변수: ${esc(o.label)}</option>`).join('')}
+                </select>
+                <select class="select" id="research-y-select" style="width:auto;padding:6px 10px;font-size:12px">
+                  <option value="drowsyRate" ${state.yAxisKey === 'drowsyRate' ? 'selected' : ''}>Y축: 졸음 비율 (%)</option>
+                  <option value="drowsyStudents" ${state.yAxisKey === 'drowsyStudents' ? 'selected' : ''}>Y축: 졸음 인원 (명)</option>
+                </select>
+              ` : ''}
+            </div>
+          </div>
+          ${renderResearchCharts(logs, metrics)}
+        </section>
+
+        <section class="surface" style="overflow:hidden">
+          <div class="surface-head"><h2 style="font-size:15px;font-weight:700">전체 환경 측정 기록표</h2></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>측정 회차 / 시각</th>
+                  <th class="text-right">CO₂ 농도</th>
+                  <th class="text-right">졸음 / 총 인원 (비율)</th>
+                  <th>출입문 환기</th>
+                  ${metrics.map(m => `<th class="text-right">${esc(m.name)} ${m.unit ? '(' + esc(m.unit) + ')' : ''}</th>`).join('')}
+                  <th class="text-right">삭제</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${logs.slice().reverse().map(l => `
+                  <tr>
+                    <td>
+                      <div style="font-weight:600">${esc(l.sessionLabel)}</div>
+                      <div class="mono-num" style="font-size:11px;color:var(--text-muted)">${esc(formatKstDateTime(l.recordedAt))}</div>
+                    </td>
+                    <td class="text-right mono-num"><strong>${l.co2Ppm} ppm</strong></td>
+                    <td class="text-right mono-num">${l.drowsyStudents}/${l.totalStudents}명 <strong class="${l.drowsyRate >= 25 ? 'text-red' : l.drowsyRate >= 12 ? 'text-amber' : 'text-green'}">(${l.drowsyRate}%)</strong></td>
+                    <td style="font-size:12.5px;font-weight:600" class="${l.doorVentilation === 'open' ? 'text-green' : l.doorVentilation === 'partial' ? 'text-amber' : 'text-red'}">
+                      ${l.doorVentilation === 'open' ? '개방 (환기)' : l.doorVentilation === 'partial' ? '부분 개방' : '닫힘 (밀폐)'}
+                    </td>
+                    ${metrics.map(m => {
+                      const v = l.customValues[m.id];
+                      return `<td class="text-right mono-num">${v === undefined ? '-' : typeof v === 'boolean' ? (v ? '예' : '아니오') : v}</td>`;
+                    }).join('')}
+                    <td class="text-right"><button type="button" class="btn btn-danger-ghost" data-action="delete-research" data-log-id="${esc(l.id)}">${svgIcon('trash', 14)}</button></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      `;
+    }
+
+    // ==================== MEMBER & PERMISSIONS MODAL ====================
+    function renderMemberModal(user) {
+      if (!state.showMemberModal || user.role !== 'leader') return '';
+      return `
+        <div class="modal-backdrop">
+          <div class="modal-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--border-hairline);margin-bottom:18px">
+              <div>
+                <h2 style="font-size:17px;font-weight:700">방장 · 학생 명단 및 권한 관리</h2>
+                <p style="font-size:12px;color:var(--text-muted);margin-top:2px">여러 명의 방장 계정을 서로 다른 이름으로 발급하고, CO₂ 연구 담당자를 지정할 수 있습니다.</p>
+              </div>
+              <button type="button" class="btn btn-outline btn-sm" data-action="close-members">${svgIcon('x', 15)}</button>
+            </div>
+
+            <div style="margin-bottom:20px">
+              <h3 style="font-size:14px;font-weight:700;margin-bottom:10px">방장 · 연구원 계정 추가 발급</h3>
+              <form id="create-account-form" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+                <input class="input" name="name" required placeholder="실명 (예: 김서연)" />
+                <input class="input" name="title" required value="4층 방장" placeholder="직책 (예: 4층 방장)" />
+                <select class="select" name="role">
+                  <option value="leader">반장 / 방장 권한</option>
+                  <option value="student">학생 권한</option>
+                </select>
+                <input class="input" name="username" required placeholder="로그인 아이디" />
+                <input class="input" type="password" name="password" required minlength="4" placeholder="비밀번호 (4자 이상)" />
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                  <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer">
+                    <input type="checkbox" name="isResearcher" /> CO₂ 연구 권한
+                  </label>
+                  <button type="submit" class="btn btn-primary btn-sm">발급</button>
+                </div>
+              </form>
+            </div>
+
+            <div style="margin-bottom:20px;padding-top:16px;border-top:1px solid #f1f5f9">
+              <h3 style="font-size:14px;font-weight:700;margin-bottom:10px">면학실 학생 명단 추가</h3>
+              <form id="add-student-form" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px">
+                <input class="input" name="name" required placeholder="학생 이름" />
+                <input class="input" name="room" required placeholder="호실 (예: 306호)" />
+                <select class="select" name="grade">
+                  <option value="1학년">1학년</option>
+                  <option value="2학년" selected>2학년</option>
+                  <option value="3학년">3학년</option>
+                </select>
+                <button type="submit" class="btn btn-dark btn-sm">명단 추가</button>
+              </form>
+            </div>
+
+            <div style="padding-top:16px;border-top:1px solid #f1f5f9">
+              <h3 style="font-size:14px;font-weight:700;margin-bottom:10px">가입된 계정 권한 설정 (${state.store.users.length}명)</h3>
+              <div style="border:1px solid var(--border-hairline);border-radius:8px">
+                ${state.store.users.map(u => `
+                  <div style="padding:10px 14px;border-bottom:1px solid #f1f5f9;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px">
+                    <div><strong>${esc(u.name)}</strong> <span style="color:var(--text-muted)">(${esc(u.title)} · @${esc(u.username)})</span></div>
+                    <div style="display:flex;gap:8px">
+                      <button type="button" class="btn btn-outline btn-sm" ${u.id === user.id ? 'disabled' : ''} data-action="toggle-role" data-user-id="${esc(u.id)}">
+                        ${u.role === 'leader' ? '반장 권한' : '일반 학생'}
+                      </button>
+                      <button type="button" class="btn btn-outline btn-sm" data-action="toggle-researcher" data-user-id="${esc(u.id)}">
+                        ${u.isResearcher ? '<span class="text-green">CO₂ 연구 지정됨</span>' : '연구 권한 없음'}
+                      </button>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ==================== MAIN RENDER ====================
+    function render() {
+      const root = document.getElementById('app');
+      const user = getCurrentUser();
+      if (!user) {
+        root.innerHTML = renderAuth();
+        bindDynamicInputs();
+        return;
+      }
+
+      const navItems = [
+        { id: 'overview', label: '졸음·상벌점', visible: true },
+        { id: 'extrastudy', label: '추가면학', visible: true },
+        { id: 'notices', label: '공지·일정', visible: true },
+        { id: 'attendance', label: '출석인증', visible: true },
+        { id: 'whispers', label: '귓속말', visible: true },
+        { id: 'research', label: 'CO₂ 연구실', visible: user.isResearcher }
+      ];
+
+      if (state.activeTab === 'research' && !user.isResearcher) {
+        state.activeTab = 'overview';
+      }
+
+      const pendingCount = state.store.extraStudyApplications.filter(a => a.isChanged).length;
+      const activeNav = navItems.find(n => n.id === state.activeTab) || navItems[0];
+
+      let bodyHtml = '';
+      if (state.activeTab === 'overview') bodyHtml = renderOverviewTab(user);
+      else if (state.activeTab === 'extrastudy') bodyHtml = renderExtraStudyTab(user);
+      else if (state.activeTab === 'notices') bodyHtml = renderNoticesTab(user);
+      else if (state.activeTab === 'attendance') bodyHtml = renderAttendanceTab(user);
+      else if (state.activeTab === 'whispers') bodyHtml = renderWhisperTab(user);
+      else bodyHtml = renderResearchTab(user);
+
+      root.innerHTML = `
+        <div class="app-shell">
+          <header class="topbar">
+            <button type="button" class="brand-mark" data-action="switch-tab" data-tab="overview">면학마루</button>
+            <nav class="nav-links">
+              ${navItems.filter(n => n.visible).map(n => `
+                <button type="button" class="nav-link ${state.activeTab === n.id ? 'active' : ''}" data-action="switch-tab" data-tab="${n.id}">
+                  ${n.label}${n.id === 'extrastudy' && pendingCount > 0 ? ` <span class="mono-num text-amber">(${pendingCount})</span>` : ''}
+                </button>
+              `).join('')}
+            </nav>
+            <div class="topbar-actions">
+              <button type="button" class="btn btn-outline btn-sm" data-action="download-html">
+                ${svgIcon('download', 14)}<span>index.html 다운로드</span>
+              </button>
+              ${user.role === 'leader' ? `
+                <button type="button" class="btn btn-dark btn-sm" data-action="open-members">
+                  ${svgIcon('users', 14)}<span>멤버·권한</span>
+                </button>
+              ` : `
+                <button type="button" class="btn btn-outline btn-sm" data-action="logout">
+                  ${svgIcon('logout', 14)}<span>로그아웃</span>
+                </button>
+              `}
+            </div>
+          </header>
+
+          <nav class="mobile-nav">
+            ${navItems.filter(n => n.visible).map(n => `
+              <button type="button" class="btn btn-sm ${state.activeTab === n.id ? 'btn-primary' : 'btn-outline'}" data-action="switch-tab" data-tab="${n.id}">${n.label}</button>
+            `).join('')}
+          </nav>
+
+          <div class="container">
+            <div class="workspace-head">
+              <div>
+                <h1 class="workspace-title">${esc(activeNav.label)}</h1>
+                <div class="workspace-meta">
+                  접속자: <strong style="color:var(--text-primary)">${esc(user.name)}</strong> · ${esc(user.title)}
+                  ${user.isResearcher ? ' · CO₂ 연구 담당' : ''}
+                </div>
+              </div>
+              ${user.role === 'leader' ? `
+                <button type="button" class="btn btn-outline btn-sm" data-action="logout">
+                  ${svgIcon('logout', 14)}<span>계정 전환 / 로그아웃</span>
+                </button>
+              ` : ''}
+            </div>
+
+            ${state.feedback ? `<div class="alert ${state.feedback.type === 'ok' ? 'alert-ok' : 'alert-err'}">${esc(state.feedback.text)}</div>` : ''}
+
+            ${bodyHtml}
+          </div>
+          ${renderMemberModal(user)}
+        </div>
+      `;
+
+      bindDynamicInputs();
+      if (state.cameraActive && state.mediaStream) {
+        const vid = document.getElementById('att-video');
+        if (vid && vid.srcObject !== state.mediaStream) {
+          vid.srcObject = state.mediaStream;
+          vid.play().catch(() => {});
+        }
+      }
+      const wScroll = document.getElementById('whisper-scroll');
+      if (wScroll) wScroll.scrollTop = wScroll.scrollHeight;
+    }
+
+    function bindDynamicInputs() {
+      const presetSel = document.getElementById('behavior-preset-select');
+      if (presetSel) {
+        presetSel.onchange = () => {
+          const [, , label, pts] = presetSel.value.split('|');
+          const lblInput = document.getElementById('behavior-label-input');
+          const ptsInput = document.getElementById('behavior-points-input');
+          if (lblInput) lblInput.value = label;
+          if (ptsInput) ptsInput.value = pts;
+        };
+      }
+      const searchInp = document.getElementById('overview-search-input');
+      if (searchInp) {
+        searchInp.oninput = (e) => {
+          state.overviewSearch = e.target.value;
+          const pos = e.target.selectionStart;
+          render();
+          const next = document.getElementById('overview-search-input');
+          if (next) { next.focus(); next.setSelectionRange(pos, pos); }
+        };
+      }
+      const rx = document.getElementById('research-x-select');
+      if (rx) rx.onchange = (e) => { state.xAxisKey = e.target.value; render(); };
+      const ry = document.getElementById('research-y-select');
+      if (ry) ry.onchange = (e) => { state.yAxisKey = e.target.value; render(); };
+    }
+
+    // ==================== CAMERA & GEOLOCATION ====================
+    function stopCamera() {
+      if (state.mediaStream) {
+        state.mediaStream.getTracks().forEach(t => t.stop());
+        state.mediaStream = null;
+      }
+      state.cameraActive = false;
+    }
+
+    function refreshGeo() {
+      if (!navigator.geolocation) {
+        state.geo = { status: 'err', lat: null, lng: null, acc: null, label: '위치 서비스 미지원', err: '브라우저가 위치 정보를 지원하지 않습니다.' };
+        render();
+        return;
+      }
+      state.geo.status = 'loading';
+      state.geo.err = null;
+      render();
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const lat = Number(pos.coords.latitude.toFixed(6));
+          const lng = Number(pos.coords.longitude.toFixed(6));
+          const acc = Math.round(pos.coords.accuracy);
+          let label = `위도 ${lat}, 경도 ${lng}`;
+          try {
+            const ctrl = new AbortController();
+            setTimeout(() => ctrl.abort(), 2500);
+            const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=ko`, { signal: ctrl.signal });
+            if (r.ok) {
+              const d = await r.json();
+              if (d.address) {
+                const parts = [d.address.city, d.address.borough || d.address.suburb, d.address.neighbourhood || d.address.road].filter(Boolean).join(' ');
+                if (parts) label = parts;
+              }
+            }
+          } catch (e) {}
+          state.geo = { status: 'ready', lat, lng, acc, label, err: null };
+          render();
+        },
+        (err) => {
+          state.geo = { status: 'err', lat: null, lng: null, acc: null, label: '위치 권한 필요', err: '위치 수신 실패: ' + err.message };
+          render();
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+
+    async function startCamera() {
+      state.cameraError = null;
+      refreshGeo();
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        state.cameraError = '이 브라우저에서는 실시간 카메라를 사용할 수 없습니다.';
+        render();
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+        state.mediaStream = stream;
+        state.cameraActive = true;
+        render();
+      } catch (err) {
+        state.cameraError = '카메라를 시작할 수 없습니다 (' + err.message + '). 조작 방지를 위해 파일 업로드는 허용되지 않습니다.';
+        render();
+      }
+    }
+
+    async function captureAttendance(user) {
+      const vid = document.getElementById('att-video');
+      if (!vid) return;
+      const w = vid.videoWidth || 1280, h = vid.videoHeight || 720;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(vid, 0, 0, w, h);
+
+      const nowIso = new Date().toISOString();
+      const stamp = formatKstDateTime(nowIso);
+      const locStamp = state.geo.lat !== null
+        ? `${state.geo.label} (${state.geo.lat}, ${state.geo.lng} · ±${state.geo.acc}m)`
+        : state.geo.label;
+
+      const barH = Math.max(72, Math.round(h * 0.14));
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.84)';
+      ctx.fillRect(0, h - barH, w, barH);
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = `bold ${Math.max(16, Math.round(w * 0.022))}px monospace`;
+      ctx.fillText(`CAPTURE TIME (KST): ${stamp}`, 24, h - barH + Math.round(barH * 0.42));
+      ctx.fillStyle = '#93c5fd';
+      ctx.font = `${Math.max(14, Math.round(w * 0.018))}px sans-serif`;
+      ctx.fillText(`LOCATION: ${locStamp}`, 24, h - barH + Math.round(barH * 0.78));
+
+      const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.9));
+      if (!blob) return;
+
+      const sel = document.getElementById('attendance-student-select');
+      const targetStuId = (user.role === 'leader' && sel) ? sel.value : (user.studentId || user.id);
+      const stu = state.store.students.find(s => s.id === targetStuId);
+
+      const mediaId = randomId('attmedia');
+      await saveMediaBlob(mediaId, blob);
+
+      const verifyHash = (await sha256Hex(`${targetStuId}|${nowIso}|${state.geo.lat}|${state.geo.lng}|${blob.size}`)).slice(0, 12).toUpperCase();
+      state.store.attendanceCheckins.unshift({
+        id: randomId('att'),
+        mediaId,
+        studentId: targetStuId,
+        studentName: stu ? stu.name : user.name,
+        room: stu ? stu.room : user.room,
+        latitude: state.geo.lat,
+        longitude: state.geo.lng,
+        accuracy: state.geo.acc,
+        locationLabel: state.geo.label,
+        capturedAt: nowIso,
+        verificationCode: verifyHash
+      });
+      saveStore();
+      stopCamera();
+      setFeedback('ok', '실시간 학원 출석 사진과 시각·위치 인증 기록이 저장되었습니다.');
+      render();
+    }
+
+    // ==================== EVENT DELEGATION ====================
+    document.addEventListener('click', async (e) => {
+      const target = e.target.closest('[data-action]');
+      if (!target) return;
+      const action = target.getAttribute('data-action');
+      const user = getCurrentUser();
+
+      if (action === 'download-html') {
+        downloadStandaloneIndexHtml();
+        return;
+      }
+      if (action === 'auth-tab') {
+        state.authTab = target.getAttribute('data-tab');
+        state.authError = null;
+        render();
+        return;
+      }
+      if (action === 'logout') {
+        stopCamera();
+        setCurrentUser(null);
+        state.feedback = null;
+        render();
+        return;
+      }
+      if (!user) return;
+
+      if (action === 'switch-tab') {
+        const tab = target.getAttribute('data-tab');
+        if (tab === 'research' && !user.isResearcher) return;
+        if (state.activeTab === 'attendance' && tab !== 'attendance') stopCamera();
+        state.activeTab = tab;
+        state.feedback = null;
+        render();
+      } else if (action === 'overview-filter') {
+        state.overviewFilter = target.getAttribute('data-filter');
+        render();
+      } else if (action === 'select-student') {
+        state.selectedStudentId = target.getAttribute('data-student-id');
+        state.hoveredScoreLogId = null;
+        render();
+      } else if (action === 'quick-drowsy' && user.role === 'leader') {
+        e.stopPropagation();
+        const sid = target.getAttribute('data-student-id');
+        const stu = state.store.students.find(s => s.id === sid);
+        if (!stu) return;
+        state.store.behaviorLogs.unshift({
+          id: randomId('log'),
+          studentId: stu.id,
+          studentName: stu.name,
+          category: 'drowsiness',
+          label: '면학 중 졸음',
+          type: 'drowsy',
+          pointsDelta: -1,
+          note: '면학 중 졸음 빠른 체크',
+          recordedByName: `${user.name} (${user.title})`,
+          recordedAt: new Date().toISOString()
+        });
+        state.selectedStudentId = stu.id;
+        saveStore();
+        setFeedback('ok', `${stu.name} 학생 졸음 1회가 기록되었습니다.`);
+        render();
+      } else if (action === 'delete-behavior' && user.role === 'leader') {
+        const lid = target.getAttribute('data-log-id');
+        state.store.behaviorLogs = state.store.behaviorLogs.filter(l => l.id !== lid);
+        saveStore();
+        render();
+      } else if (action === 'extra-filter') {
+        state.extraFilter = target.getAttribute('data-filter');
+        render();
+      } else if (action === 'set-extra-choice') {
+        const sid = target.getAttribute('data-student-id');
+        const choice = target.getAttribute('data-choice');
+        const isLeader = user.role === 'leader';
+        if (!isLeader && user.studentId !== sid) return;
+        if (!isLeader && isPastDeadline(state.store.config)) {
+          setFeedback('err', `마감 시간(${state.store.config.extraStudyDeadline})이 지나 수정할 수 없습니다.`);
+          render();
+          return;
+        }
+        const dCnt = getDrowsyCount(sid);
+        if (dCnt >= state.store.config.maxDrowsyLimit && choice !== 'none') {
+          setFeedback('err', `졸음 횟수(${dCnt}회)가 제한 기준(${state.store.config.maxDrowsyLimit}회) 이상이므로 추가면학을 신청할 수 없습니다.`);
+          render();
+          return;
+        }
+        const stu = state.store.students.find(s => s.id === sid);
+        let row = state.store.extraStudyApplications.find(a => a.studentId === sid);
+        const now = new Date().toISOString();
+        if (!row && stu) {
+          row = { studentId: stu.id, studentName: stu.name, room: stu.room, choice, previousChoice: null, isChanged: false, changedAt: null, acknowledgedBy: null, acknowledgedAt: null, updatedAt: now };
+          state.store.extraStudyApplications.push(row);
+        } else if (row && row.choice !== choice) {
+          row.previousChoice = row.choice;
+          row.choice = choice;
+          row.isChanged = true;
+          row.changedAt = now;
+          row.acknowledgedBy = null;
+          row.acknowledgedAt = null;
+          row.updatedAt = now;
+        }
+        saveStore();
+        setFeedback('ok', '추가 면학 신청이 반영되었습니다. 변경 시 방장 확인 전까지 강조 표시됩니다.');
+        render();
+      } else if (action === 'ack-extra' && user.role === 'leader') {
+        const sid = target.getAttribute('data-student-id');
+        const row = state.store.extraStudyApplications.find(a => a.studentId === sid);
+        if (row) {
+          row.isChanged = false;
+          row.acknowledgedBy = `${user.name} (${user.title})`;
+          row.acknowledgedAt = new Date().toISOString();
+          saveStore();
+          setFeedback('ok', '변경 확인이 완료되어 강조 표시가 해제되었습니다.');
+          render();
+        }
+      } else if (action === 'delete-notice' && user.role === 'leader') {
+        const nid = target.getAttribute('data-notice-id');
+        state.store.notices = state.store.notices.filter(n => n.id !== nid);
+        saveStore();
+        render();
+      } else if (action === 'open-lightbox') {
+        state.lightboxUrl = target.getAttribute('data-url');
+        render();
+      } else if (action === 'close-lightbox') {
+        state.lightboxUrl = null;
+        render();
+      } else if (action === 'refresh-geo') {
+        refreshGeo();
+      } else if (action === 'start-camera') {
+        startCamera();
+      } else if (action === 'stop-camera') {
+        stopCamera();
+        render();
+      } else if (action === 'capture-attendance') {
+        captureAttendance(user);
+      } else if (action === 'select-whisper') {
+        state.whisperPartnerId = target.getAttribute('data-partner-id');
+        render();
+      } else if (action === 'set-graph') {
+        state.graphType = target.getAttribute('data-graph');
+        render();
+      } else if (action === 'delete-metric' && user.isResearcher) {
+        const mid = target.getAttribute('data-metric-id');
+        state.store.customMetrics = state.store.customMetrics.filter(m => m.id !== mid);
+        if (state.xAxisKey === mid) state.xAxisKey = 'co2Ppm';
+        saveStore();
+        render();
+      } else if (action === 'delete-research' && user.isResearcher) {
+        const rid = target.getAttribute('data-log-id');
+        state.store.researchLogs = state.store.researchLogs.filter(l => l.id !== rid);
+        saveStore();
+        render();
+      } else if (action === 'export-research-csv' && user.isResearcher) {
+        const metrics = state.store.customMetrics;
+        const headers = ['측정시각', '회차명', 'CO2(ppm)', '총인원', '졸음인원', '졸음비율(%)', '출입문환기', ...metrics.map(m => m.unit ? `${m.name}(${m.unit})` : m.name), '비고'];
+        const rows = state.store.researchLogs.map(l => [
+          formatKstDateTime(l.recordedAt), l.sessionLabel, l.co2Ppm, l.totalStudents, l.drowsyStudents, l.drowsyRate,
+          l.doorVentilation === 'open' ? '개방' : l.doorVentilation === 'partial' ? '부분개방' : '닫힘',
+          ...metrics.map(m => l.customValues[m.id] === undefined ? '' : typeof l.customValues[m.id] === 'boolean' ? (l.customValues[m.id] ? '예' : '아니오') : l.customValues[m.id]),
+          l.note || ''
+        ]);
+        const csv = '\uFEFF' + [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `co2-research-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } else if (action === 'open-members' && user.role === 'leader') {
+        state.showMemberModal = true;
+        render();
+      } else if (action === 'close-members') {
+        state.showMemberModal = false;
+        render();
+      } else if (action === 'toggle-role' && user.role === 'leader') {
+        const uid = target.getAttribute('data-user-id');
+        const t = state.store.users.find(u => u.id === uid);
+        if (t && t.id !== user.id) {
+          t.role = t.role === 'leader' ? 'student' : 'leader';
+          saveStore();
+          render();
+        }
+      } else if (action === 'toggle-researcher' && user.role === 'leader') {
+        const uid = target.getAttribute('data-user-id');
+        const t = state.store.users.find(u => u.id === uid);
+        if (t) {
+          t.isResearcher = !t.isResearcher;
+          saveStore();
+          render();
+        }
+      }
+    });
+
+    // Hover events for SVG charts
+    document.addEventListener('mouseover', (e) => {
+      const s = e.target.closest('[data-hover-score]');
+      if (s) {
+        const id = s.getAttribute('data-hover-score');
+        if (state.hoveredScoreLogId !== id) { state.hoveredScoreLogId = id; render(); }
+        return;
+      }
+      const r = e.target.closest('[data-hover-research]');
+      if (r) {
+        const id = r.getAttribute('data-hover-research');
+        if (state.hoveredResearchId !== id) { state.hoveredResearchId = id; render(); }
+      }
+    });
+
+    // Form Submissions
+    document.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const fd = new FormData(form);
+      const user = getCurrentUser();
+
+      if (form.id === 'auth-form') {
+        state.authError = null;
+        const needsBootstrap = state.store.users.length === 0;
+        const username = String(fd.get('username') || '').trim();
+        const password = String(fd.get('password') || '');
+
+        if (needsBootstrap) {
+          const name = String(fd.get('name') || '').trim();
+          const title = String(fd.get('title') || '총괄 반장').trim();
+          const confirm = String(fd.get('confirmPassword') || '');
+          if (password !== confirm) { state.authError = '비밀번호 확인이 일치하지 않습니다.'; render(); return; }
+          const newUser = {
+            id: randomId('usr'), username, name, title, role: 'leader', isResearcher: true,
+            room: '운영실', passwordHash: await hashPassword(password), createdAt: new Date().toISOString()
+          };
+          state.store.users.push(newUser);
+          saveStore();
+          setCurrentUser(newUser.id);
+          render();
+        } else if (state.authTab === 'register') {
+          const name = String(fd.get('name') || '').trim();
+          const room = String(fd.get('room') || '').trim();
+          const grade = String(fd.get('grade') || '2학년').trim();
+          const confirm = String(fd.get('confirmPassword') || '');
+          if (password !== confirm) { state.authError = '비밀번호 확인이 일치하지 않습니다.'; render(); return; }
+          if (state.store.users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+            state.authError = '이미 사용 중인 아이디입니다.'; render(); return;
+          }
+          let stu = state.store.students.find(s => s.name === name);
+          if (!stu) {
+            stu = { id: randomId('stu'), name, room, grade, createdAt: new Date().toISOString() };
+            state.store.students.push(stu);
+            state.store.extraStudyApplications.push({
+              studentId: stu.id, studentName: stu.name, room: stu.room, choice: 'none',
+              previousChoice: null, isChanged: false, changedAt: null, acknowledgedBy: null, acknowledgedAt: null, updatedAt: new Date().toISOString()
+            });
+          }
+          const newUser = {
+            id: randomId('usr'), username, name: stu.name, title: `${stu.room} 학생`, role: 'student',
+            isResearcher: false, room: stu.room, studentId: stu.id, passwordHash: await hashPassword(password), createdAt: new Date().toISOString()
+          };
+          state.store.users.push(newUser);
+          saveStore();
+          setCurrentUser(newUser.id);
+          render();
+        } else {
+          const found = state.store.users.find(u => u.username.toLowerCase() === username.toLowerCase() || u.name.toLowerCase() === username.toLowerCase());
+          if (!found || !(await verifyPassword(password, found.passwordHash))) {
+            state.authError = '아이디(또는 실명)와 비밀번호를 확인해 주세요.'; render(); return;
+          }
+          setCurrentUser(found.id);
+          state.feedback = null;
+          render();
+        }
+        return;
+      }
+
+      if (!user) return;
+
+      if (form.id === 'limit-form' && user.role === 'leader') {
+        const val = Math.max(1, Math.min(20, Math.round(Number(fd.get('maxDrowsyLimit') || 3))));
+        state.store.config.maxDrowsyLimit = val;
+        saveStore();
+        setFeedback('ok', `졸음 제한 기준이 ${val}회로 변경되었습니다.`);
+        render();
+      } else if (form.id === 'behavior-form' && user.role === 'leader') {
+        const sid = String(fd.get('studentId'));
+        const stu = state.store.students.find(s => s.id === sid);
+        if (!stu) return;
+        const [type, category] = String(fd.get('preset')).split('|');
+        const absPts = Math.max(0, Math.min(20, Math.round(Number(fd.get('pointsAbs') || 1))));
+        state.store.behaviorLogs.unshift({
+          id: randomId('log'),
+          studentId: stu.id,
+          studentName: stu.name,
+          category,
+          label: String(fd.get('label') || '').trim(),
+          type,
+          pointsDelta: type === 'merit' ? absPts : -absPts,
+          note: String(fd.get('note') || '').trim(),
+          recordedByName: `${user.name} (${user.title})`,
+          recordedAt: new Date().toISOString()
+        });
+        state.selectedStudentId = stu.id;
+        saveStore();
+        setFeedback('ok', `${stu.name} 학생 기록이 저장되었습니다.`);
+        render();
+      } else if (form.id === 'deadline-form' && user.role === 'leader') {
+        state.store.config.deadlineEnabled = form.querySelector('[name="deadlineEnabled"]').checked;
+        state.store.config.extraStudyDeadline = String(fd.get('extraStudyDeadline') || '24:00').trim();
+        saveStore();
+        setFeedback('ok', '추가 면학 신청 마감 설정이 저장되었습니다.');
+        render();
+      } else if (form.id === 'notice-form' && user.role === 'leader') {
+        const fileInput = document.getElementById('notice-files');
+        const files = fileInput ? Array.from(fileInput.files || []).slice(0, 5) : [];
+        const attachments = [];
+        for (const f of files) {
+          const mid = randomId('nmedia');
+          await saveMediaBlob(mid, f);
+          attachments.push({
+            id: mid,
+            originalName: f.name,
+            kind: f.type.startsWith('video/') ? 'video' : 'image'
+          });
+        }
+        state.store.notices.unshift({
+          id: randomId('notice'),
+          title: String(fd.get('title') || '').trim(),
+          content: String(fd.get('content') || '').trim(),
+          scheduleDate: String(fd.get('scheduleDate') || '').trim() || null,
+          authorName: user.name,
+          authorTitle: user.title,
+          attachments,
+          createdAt: new Date().toISOString()
+        });
+        saveStore();
+        setFeedback('ok', `${user.name} (${user.title}) 명의로 공지가 등록되었습니다.`);
+        render();
+      } else if (form.id === 'whisper-form') {
+        const partner = state.store.users.find(u => u.id === state.whisperPartnerId);
+        const text = String(fd.get('text') || '').trim();
+        if (!partner || !text) return;
+        const isLeader = user.role === 'leader';
+        const stuUser = isLeader ? partner : user;
+        const ldrUser = isLeader ? user : partner;
+        state.store.whisperMessages.push({
+          id: randomId('msg'),
+          threadKey: `${stuUser.id}__${ldrUser.id}`,
+          studentUserId: stuUser.id,
+          leaderUserId: ldrUser.id,
+          senderUserId: user.id,
+          senderName: isLeader ? `${user.name} (${user.title})` : user.name,
+          text,
+          readByRecipient: false,
+          readAt: null,
+          createdAt: new Date().toISOString()
+        });
+        saveStore();
+        render();
+      } else if (form.id === 'metric-add-form' && user.isResearcher) {
+        state.store.customMetrics.push({
+          id: randomId('metric'),
+          name: String(fd.get('name') || '').trim(),
+          unit: String(fd.get('unit') || '').trim(),
+          type: fd.get('type') === 'boolean' ? 'boolean' : 'number'
+        });
+        saveStore();
+        setFeedback('ok', '새 측정 항목이 추가되었습니다.');
+        render();
+      } else if (form.id === 'research-log-form' && user.isResearcher) {
+        const total = Math.max(1, Math.round(Number(fd.get('totalStudents') || 1)));
+        const drowsy = Math.max(0, Math.min(total, Math.round(Number(fd.get('drowsyStudents') || 0))));
+        const customValues = {};
+        state.store.customMetrics.forEach(m => {
+          const raw = fd.get('custom_' + m.id);
+          if (m.type === 'boolean') customValues[m.id] = raw === 'true';
+          else if (raw !== null && String(raw).trim() !== '') {
+            const num = Number(raw);
+            if (!isNaN(num)) customValues[m.id] = num;
+          }
+        });
+        state.store.researchLogs.push({
+          id: randomId('res'),
+          recordedAt: new Date().toISOString(),
+          sessionLabel: String(fd.get('sessionLabel') || '면학 측정').trim(),
+          co2Ppm: Math.round(Number(fd.get('co2Ppm') || 1000)),
+          totalStudents: total,
+          drowsyStudents: drowsy,
+          drowsyRate: Number(((drowsy / total) * 100).toFixed(1)),
+          doorVentilation: String(fd.get('doorVentilation') || 'closed'),
+          customValues,
+          note: String(fd.get('note') || '').trim(),
+          recordedBy: `${user.name} (${user.title})`
+        });
+        saveStore();
+        setFeedback('ok', '환경 측정 수치가 기록되었습니다.');
+        render();
+      } else if (form.id === 'create-account-form' && user.role === 'leader') {
+        const username = String(fd.get('username') || '').trim();
+        const password = String(fd.get('password') || '');
+        if (state.store.users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+          setFeedback('err', '이미 존재하는 아이디입니다.');
+          render();
+          return;
+        }
+        const role = fd.get('role') === 'leader' ? 'leader' : 'student';
+        const name = String(fd.get('name') || '').trim();
+        let stuId;
+        if (role === 'student') {
+          let stu = state.store.students.find(s => s.name === name);
+          if (!stu) {
+            stu = { id: randomId('stu'), name, room: '미배정', grade: '2학년', createdAt: new Date().toISOString() };
+            state.store.students.push(stu);
+          }
+          stuId = stu.id;
+        }
+        state.store.users.push({
+          id: randomId('usr'),
+          username,
+          name,
+          title: String(fd.get('title') || (role === 'leader' ? '방장' : '학생')).trim(),
+          role,
+          isResearcher: form.querySelector('[name="isResearcher"]').checked,
+          room: '운영실',
+          studentId: stuId,
+          passwordHash: await hashPassword(password),
+          createdAt: new Date().toISOString()
+        });
+        saveStore();
+        setFeedback('ok', `${name} 계정이 발급되었습니다.`);
+        render();
+      } else if (form.id === 'add-student-form' && user.role === 'leader') {
+        const name = String(fd.get('name') || '').trim();
+        const room = String(fd.get('room') || '').trim();
+        const grade = String(fd.get('grade') || '2학년').trim();
+        const stu = { id: randomId('stu'), name, room, grade, createdAt: new Date().toISOString() };
+        state.store.students.push(stu);
+        state.store.extraStudyApplications.push({
+          studentId: stu.id, studentName: stu.name, room: stu.room, choice: 'none',
+          previousChoice: null, isChanged: false, changedAt: null, acknowledgedBy: null, acknowledgedAt: null, updatedAt: new Date().toISOString()
+        });
+        saveStore();
+        setFeedback('ok', `${name} 학생이 명단에 추가되었습니다.`);
+        render();
+      }
+    });
+
+    // Live clock update on attendance screen
+    setInterval(() => {
+      const c1 = document.getElementById('live-att-clock');
+      const c2 = document.getElementById('live-cam-clock');
+      if (c1 || c2) {
+        const t = formatKstDateTime(new Date().toISOString());
+        if (c1) c1.textContent = t;
+        if (c2) c2.textContent = '촬영 시각: ' + t;
+      }
+    }, 1000);
+
+    // Boot
+    hydrateAllMediaUrls(state.store).then(() => render());
+    render();
+  })();
+  </script>
+</body>
+</html>
